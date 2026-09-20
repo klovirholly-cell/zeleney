@@ -1,0 +1,15 @@
+{
+  "name": "Зеленей",
+  "short_name": "Зеленей",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7faef",
+  "theme_color": "#5d9b58",
+  "icons": [
+    {
+      "src": "icons/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}

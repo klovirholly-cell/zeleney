@@ -1,0 +1,1011 @@
+    <!DOCTYPE html>
+    <html lang="ru">
+    <script src="https://api-maps.yandex.ru/v3/?apikey=70e90cbd-0e35-4021-a977-7f696111a153&lang=ru_RU"></script>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Зеленей</title>
+
+    <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #dcebd5;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .app {
+        width: 390px;
+        min-height: 100vh;
+        background: #f7faef;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Экраны */
+
+    .screen {
+        display: none;
+        min-height: calc(100vh - 75px);
+        padding: 25px 20px 100px;
+    }
+
+    .screen.active {
+        display: block;
+    }
+
+    /* Главная */
+
+    h1 {
+        color: #315f3b;
+        font-size: 28px;
+        margin-bottom: 5px;
+    }
+
+    .subtitle {
+        color: #71816d;
+        margin-bottom: 20px;
+    }
+
+    .ambassador {
+        background: linear-gradient(135deg, #d9edc9, #c8e5b5);
+        border-radius: 25px;
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px #d2e2ca;
+    }
+
+    .mascot {
+        width: 90px;
+        height: 90px;
+        background: #8fc76d;
+        border-radius: 50% 50% 45% 45%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 48px;
+        box-shadow: 0 5px 10px #aac69f;
+    }
+    .mascot-video {
+        width: 90px;
+        height: 90px;
+        object-fit: contain;
+        border: none;
+        border-radius: 20px;
+        background: transparent;
+        display: block;
+    }
+
+    .hello {
+        color: #315f3b;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 18px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 14px rgba(80, 120, 70, 0.10);
+    }
+
+    .card h3 {
+        color: #315f3b;
+        margin-bottom: 8px;
+    }
+
+    .progress {
+        height: 12px;
+        background: #e4eddF;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    .progress-bar {
+        width: 35%;
+        height: 100%;
+        background: linear-gradient(90deg, #5d9b58, #83b96e);
+        border-radius: 20px;
+    }
+
+    .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .action {
+        background: #ffffff;
+        border: none;
+        border-radius: 20px;
+        padding: 20px 10px;
+        font-size: 14px;
+        color: #315f3b;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(80, 120, 70, 0.10);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(80, 120, 70, 0.15);
+    }
+
+    .action span {
+        display: block;
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    /* Карта */
+
+    .map {
+        height: 430px;
+        border-radius: 25px;
+        background:
+            linear-gradient(30deg, transparent 45%, #d5dfca 46%, #d5dfca 48%, transparent 49%),
+            linear-gradient(120deg, transparent 45%, #d5dfca 46%, #d5dfca 48%, transparent 49%),
+            #e9eee2;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 14px rgba(80, 120, 70, 0.12);
+    }
+
+    .point {
+        position: absolute;
+        width: 45px;
+        height: 45px;
+        background: #5d9b58;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        box-shadow: 0 4px 10px rgba(70, 120, 65, 0.25);
+        border: 3px solid white;
+    }
+
+    .point span {
+        transform: rotate(45deg);
+    }
+
+    .p1 { top: 70px; left: 80px; }
+    .p2 { top: 160px; right: 70px; }
+    .p3 { bottom: 120px; left: 130px; }
+    .p4 { bottom: 60px; right: 100px; }
+
+    /* История */
+
+    .history-item {
+        background: white;
+        padding: 16px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(80, 120, 70, 0.08);
+        transition: transform 0.15s;
+    }
+
+    .history-item:active {
+        transform: scale(0.98);
+    }
+
+    .history-icon {
+        width: 48px;
+        height: 48px;
+        background: #e1efd8;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .history-item h4 {
+        color: #315f3b;
+    }
+
+    .history-item p {
+        color: #879183;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    /* Профиль */
+
+    .profile-header {
+        text-align: center;
+        padding: 15px;
+    }
+
+    .avatar {
+        width: 95px;
+        height: 95px;
+        background: linear-gradient(135deg, #c8e5b5, #a8d68e);
+        border-radius: 50%;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 46px;
+        box-shadow: 0 5px 15px rgba(80, 120, 70, 0.15);
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .stat {
+        background: white;
+        border-radius: 20px;
+        padding: 16px 5px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(80, 120, 70, 0.08);
+    }
+
+    .stat strong {
+        display: block;
+        font-size: 24px;
+        color: #397244;
+        margin-bottom: 3px;
+    }
+
+    .stat span {
+        font-size: 11px;
+        color: #7c8879;
+    }
+
+    /* Камера */
+    .camera {
+        height: 500px;
+        background: linear-gradient(160deg, #304c36, #1f3325);
+        border-radius: 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        padding-bottom: 35px;
+        color: white;
+        box-shadow: 0 5px 15px rgba(50, 80, 55, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .camera-button {
+        width: 78px;
+        height: 78px;
+        background: white;
+        border: 6px solid #b8d3ae;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.15s;
+    }
+
+    .camera-button:active {
+        transform: scale(0.92);
+    }
+
+    /* Нижняя навигация */
+
+    .nav {
+        position: fixed;
+        bottom: 0;
+        width: 390px;
+        height: 75px;
+        background: rgba(255, 255, 255, 0.96);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        border-top: 1px solid #e1eadc;
+        box-shadow: 0 -4px 15px rgba(80, 120, 70, 0.08);
+    }
+
+    .nav button {
+        background: none;
+        border: none;
+        color: #7b8878;
+        font-size: 11px;
+        cursor: pointer;
+        min-width: 55px;
+        padding: 5px 3px;
+    }
+
+    .nav button.active {
+        color: #397244;
+        font-weight: bold;
+    }
+
+    .nav-icon {
+        display: block;
+        font-size: 24px;
+        margin-bottom: 3px;
+    }
+
+    .camera-nav {
+        width: 60px;
+        height: 60px;
+        background: #5d9b58 !important;
+        border-radius: 50%;
+        color: white !important;
+        margin-top: -28px;
+        box-shadow: 0 6px 15px rgba(70, 120, 65, 0.25);
+        border: 5px solid #f5f8ee !important;
+        font-size: 24px !important;
+    }
+    .point-card {
+    display: none;
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 22px;
+    box-shadow: 0 8px 25px rgba(50, 90, 50, 0.2);
+    z-index: 1000;
+}
+
+.point-card h3 {
+    color: #315f3b;
+    margin-bottom: 8px;
+}
+
+.point-card p {
+    color: #71816d;
+    line-height: 1.4;
+    margin-bottom: 15px;
+}
+
+.point-card > button:first-child {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: #71816d;
+    cursor: pointer;
+}
+
+.help-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 15px;
+    background: #5d9b58;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+.preview-photo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 80%;
+    height: 300px;
+
+    object-fit: cover;
+    border-radius: 20px;
+
+    z-index: 1;
+}
+
+.camera p,
+.camera-button {
+    position: relative;
+    z-index: 2;
+}
+    </style>
+    </head>
+
+    <body>
+
+    <div class="app">
+
+        <!-- ГЛАВНАЯ -->
+        <section id="home" class="screen active">
+
+            <h1>Привет! 🌱 </h1>
+            <p class="subtitle">Сделаем город немного зеленее?</p>
+
+            <div class="ambassador">
+
+                <video class="mascot-video" autoplay muted loop playsinline>
+        <source src="images/zolik.mp4" type="video/mp4">
+    </video>
+
+                <div class="hello">
+                    <b>Привет! Я Золик 💚 </b>
+                    <br>
+                    Давай вместе сделаем наш город зеленее!
+                </div>
+
+            </div>
+
+            <div class="card">
+                <h3>🌿  Твой вклад</h3>
+
+                <b><span id="plantCount">12</span> растений</b> уже добавлено
+
+                <div class="progress">
+                    <div class="progress-bar"></div>
+                </div>
+
+                <small id="progressText">12 / 50 до следующей цели</small>
+                <small id="progressPercent">24%</small>
+            </div>
+
+            <div class="actions">
+
+                <button class="action" onclick="addPlant()">
+        <span>🌱 </span>
+        Посадить растение
+    </button>
+
+                <button class="action" onclick="showScreen('map')">
+                        <span>📍  </span>
+                        Найти место
+                </button>
+
+                <button class="action" onclick="showScreen('camera')">
+                    <span>📷</span>
+                    Сделать фото
+                </button>
+
+                <button class="action" onclick="showScreen('history')">
+                    <span>📖 </span>
+                    Моя история
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- КАРТА -->
+        <section id="map" class="screen">
+
+            <h1>Карта 🗺️ </h1>
+            <p class="subtitle">Места, где можно помочь природе</p>
+
+            <div class="map" id="yandexMap"></div>
+            <div id="pointCard" class="point-card">
+                <button onclick="closePointCard()">✕</button>
+                <h3>🌱  Место для озеленения</h3>
+                <p id="pointMessage">
+                    Здесь можно помочь сделать город зеленее!
+                </p>
+                <button class="help-button" onclick="helpPoint()">
+                    Помочь озеленению 💚     </button>
+            </div>
+            <div class="card">
+                <h3>🌳  Ближайшая точка</h3>
+                Сквер рядом с тобой
+                <br><br>
+                <button class="action" onclick="showPoint('🌳  Сквер рядом с тобой — здесь можно помочь озеленению города!')">
+                    Подробнее →
+                </button>
+            </div>
+
+        </section>
+
+
+        <!-- КАМЕРА -->
+        <section id="camera" class="screen">
+
+            <h1>📷 Добавить фото</h1>
+            <p class="subtitle">Покажи, как становится зеленее!</p>
+
+            <div class="camera">
+                <p>Наведи камеру на растение 🌿 </p>
+
+                <img id="previewPhoto" class="preview-photo" style="display: none;">
+
+                <br>
+
+                <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto()">
+
+                <button class="camera-button" onclick="document.getElementById('photoInput').click()">
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ИСТОРИЯ -->
+        <section id="history" class="screen">
+
+            <h1>Моя история 📖 </h1>
+            <p class="subtitle">Твои маленькие шаги</p>
+            <div id="historyList">
+                <div id="photoHistory"></div>
+            <div class="history-item" onclick="showHistoryDetails('plant')">
+                <div class="history-icon">🌳 </div>
+                <div>
+                    <h4>Посадила растение</h4>
+                    <p>Сегодня · Сквер</p>
+                </div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">📷</div>
+            <div>
+                    <h4>Добавила фотографию</h4>
+                    <p>Вчера · Парк</p>
+                </div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">🌱 </div>
+                <div>
+                    <h4>Нашла новую точку</h4>
+                    <p>12 сентября · Краснодар</p>
+                </div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">💚 </div>
+                <div>
+                    <h4>Помогла озеленению</h4>
+                    <p>10 сентября · Двор</p>
+                </div>
+            </div>
+
+        </div>
+        </section>
+
+        <div id="historyDetails" class="history-details" style="display: none;">
+            <h2 id="historyDetailsTitle"></h2>
+            <p id="historyDetailsText"></p>
+
+            <button onclick="closeHistoryDetails()">
+                ← Назад
+            </button>
+        </div>
+
+
+        <!-- ПРОФИЛЬ -->
+        <section id="profile" class="screen">
+
+            <div class="profile-header">
+
+                <div class="avatar">🌱 </div>
+
+                <h1>Ира</h1>
+
+                <p class="subtitle">
+                    Зелёный друг города 💚             </p>
+
+            </div>
+
+            <div class="stats">
+
+
+            <div class="stat">
+                    <strong id="profilePlantCount">12</strong>
+                    <span>растений</span>
+
+            </div>
+
+                <div class="stat">
+                    <strong id="pointCount">5</strong>
+                    <span>точек</span>
+                </div>
+
+                <div class="stat">
+                    <strong id="photoCount">3</strong>
+                    <span>фото</span>
+                </div>
+
+            </div>
+
+            <div class="card">
+                🌿  <b>Твой прогресс</b>
+
+                <div class="progress">
+                    <div class="progress-bar"></div>
+                </div>
+
+                <br>
+                Ты уже делаешь город зеленее!
+            </div>
+
+            <div class="card">
+                🌳  Мои растения
+            </div>
+
+            <div class="card">
+                📍  Мои точки
+            </div>
+
+            <div class="card">
+                ⚙️  Настройки
+            </div>
+
+        </section>
+
+
+        <!-- НИЖНЕЕ МЕНЮ -->
+
+        <nav class="nav">
+
+            <button onclick="showScreen('home')" id="nav-home" class="active">
+                <span class="nav-icon">🏠</span>
+                Главная
+            </button>
+
+            <button onclick="showScreen('map')" id="nav-map">
+                <span class="nav-icon">🗺️ </span>
+                Карта
+            </button>
+
+            <button onclick="showScreen('camera')" class="camera-nav">
+                📷
+            </button>
+
+            <button onclick="showScreen('history')" id="nav-history">
+                <span class="nav-icon">📖 </span>
+                История
+            </button>
+
+            <button onclick="showScreen('profile')" id="nav-profile">
+                <span class="nav-icon">👤 </span>
+                Профиль
+            </button>
+
+        </nav>
+
+    </div>
+
+
+    <script>
+
+    function addPlant() {
+        let plantCount = document.getElementById('plantCount');
+        let progressText = document.getElementById('progressText');
+        let progressPercent = document.getElementById('progressPercent');
+        let progressBar = document.querySelector('.progress-bar');
+
+        let count = Number(plantCount.textContent);
+
+        if (count < 50) {
+            count = count + 1;
+
+            plantCount.textContent = count;
+            localStorage.setItem('plantCount', count);
+            document.getElementById('profilePlantCount').textContent = count;
+
+            let percent = Math.round(count / 50 * 100);
+
+            progressText.textContent = count + ' / 50 до следующей цели';
+            progressPercent.textContent = percent + '%';
+            progressBar.style.width = percent + '%';
+        }
+        if (!window.helpingPoint) {
+            addHistory('🌳  ', 'Посадила растение', 'Только что');
+        }
+        alert('Растение добавлено! 🌱 💚 ');
+    }
+    function showScreen(screenName) {
+
+        // Скрываем все экраны
+        const screens = document.querySelectorAll('.screen');
+
+        screens.forEach(screen => {
+            screen.classList.remove('active');
+        });
+
+        // Показываем нужный экран
+        document.getElementById(screenName).classList.add('active');
+
+
+        // Убираем выделение с кнопок
+        const navButtons = document.querySelectorAll('.nav button');
+
+        navButtons.forEach(button => {
+            button.classList.remove('active');
+        });
+
+
+        // Выделяем текущую кнопку
+        const currentButton =
+            document.getElementById('nav-' + screenName);
+
+        if (currentButton) {
+            currentButton.classList.add('active');
+        }
+        if (screenName === 'map') {
+            setTimeout(() => {
+                initYandexMap();
+            }, 100);
+        }
+    }
+    function showPoint(message) {
+        let pointCount = document.getElementById('pointCount');
+        let count = Number(pointCount.textContent);
+
+        count = count + 1;
+        pointCount.textContent = count;
+        localStorage.setItem('pointCount', count);
+
+
+        document.getElementById('pointMessage').textContent = message;
+        document.getElementById('pointCard').style.display = 'block';
+        document.getElementById('pointCard').dataset.pointName = message;
+    }
+    function closePointCard() {
+        document.getElementById('pointCard').style.display = 'none';
+    }
+    function helpPoint() {
+        const pointName = document.getElementById('pointCard').dataset.pointName;
+
+        window.helpingPoint = true;
+
+        addPlant();
+
+        window.helpingPoint = false;
+
+        addHistory('🌱 ', 'Помогла озеленению', pointName);
+
+        closePointCard();
+    }
+    function handlePhoto() {
+        let input = document.getElementById('photoInput');
+        let photoCount = document.getElementById('photoCount');
+        let previewPhoto = document.getElementById('previewPhoto');
+
+        if (input.files.length > 0) {
+            previewPhoto.style.display = 'block';
+
+            let count = Number(photoCount.textContent);
+            count = count + 1;
+
+            photoCount.textContent = count;
+            localStorage.setItem('photoCount', count);
+
+            addHistory('📷', 'Добавила фотографию', 'Только что');
+            let photoHistory = document.getElementById('photoHistory');
+
+            let photo = document.createElement('img');
+           const reader = new FileReader();
+
+            reader.onload = function(event) {
+                photo.src = event.target.result;
+
+                localStorage.setItem('savedPhoto', event.target.result);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+
+            photo.style.width = '100%';
+            photo.style.borderRadius = '18px';
+            photo.style.marginTop = '10px';
+
+            photoHistory.prepend(photo);
+
+
+            alert('Фото добавлено! 📷💚 ');
+        }
+    }
+
+    function addHistory(icon, title, place) {
+        let historyList = document.getElementById('historyList');
+
+        let item = document.createElement('div');
+        item.className = 'history-item';
+
+        item.setAttribute('onclick', "showHistoryDetails('plant')");
+
+        item.innerHTML = `
+            <div class="history-icon">${icon}</div>
+            <div>
+                <h4>${title}</h4>
+                <p>${place}</p>
+            </div>
+        `;
+
+        historyList.prepend(item);
+        let history = JSON.parse(localStorage.getItem('history')) || [];
+
+        history.unshift({
+            icon: icon,
+            title: title,
+            place: place
+        });
+
+        localStorage.setItem('history', JSON.stringify(history));
+    }
+function showHistoryDetails(type) {
+    let details = document.getElementById('historyDetails');
+    console.log(details);
+    let title = document.getElementById('historyDetailsTitle');
+    let text = document.getElementById('historyDetailsText');
+
+    if (type === 'plant') {
+        title.textContent = '🌳 Посадила растение';
+        text.textContent = 'Сегодня · Сквер\n\nЗдесь ты посадила новое растение и помогла сделать город зеленее! 🌱💚';
+    }
+
+    details.style.display = 'block';
+}
+
+function closeHistoryDetails() {
+    document.getElementById('historyDetails').style.display = 'none';
+}
+    let savedPlants = localStorage.getItem('plantCount');
+
+    if (savedPlants !== null) {
+        document.getElementById('plantCount').textContent = savedPlants;
+        document.getElementById('profilePlantCount').textContent = savedPlants;
+
+        let percent = Math.round(Number(savedPlants) / 50 * 100);
+
+        document.getElementById('progressText').textContent =
+            savedPlants + ' / 50 до следующей цели';
+
+        document.getElementById('progressPercent').textContent =
+            percent + '%';
+
+        document.querySelector('.progress-bar').style.width =
+            percent + '%';
+    }
+
+    let savedPoints = localStorage.getItem('pointCount');
+
+    if (savedPoints !== null) {
+        document.getElementById('pointCount').textContent = savedPoints;
+    }
+
+    let savedPhotos = localStorage.getItem('photoCount');
+
+    if (savedPhotos !== null) {
+        document.getElementById('photoCount').textContent = savedPhotos;
+    }
+    let savedPhoto = localStorage.getItem('savedPhoto');
+
+    if (savedPhoto !== null) {
+        let photoHistory = document.getElementById('photoHistory');
+
+        let photo = document.createElement('img');
+        photo.src = savedPhoto;
+
+        photo.style.width = '100%';
+        photo.style.borderRadius = '18px';
+        photo.style.marginTop = '10px';
+
+        photoHistory.prepend(photo);
+    }
+    let savedHistory = JSON.parse(localStorage.getItem('history')) || [];
+
+let uniqueHistory = [];
+
+savedHistory.forEach(item => {
+    let exists = uniqueHistory.some(savedItem =>
+        savedItem.icon === item.icon &&
+        savedItem.title === item.title &&
+        savedItem.place
+ === item.place
+    );
+
+    if (!exists) {
+        uniqueHistory.push(item);
+    }
+});
+
+localStorage.setItem('history', JSON.stringify(uniqueHistory));
+
+let historyList = document.getElementById('historyList');
+
+uniqueHistory.forEach(item => {
+    let historyItem = document.createElement('div');
+    historyItem.className = 'history-item';
+
+    historyItem.innerHTML = `
+        <div class="history-icon">${item.icon}</div>
+        <div>
+            <h4>${item.title}</h4>
+            <p>${item.place}</p>
+        </div>
+    `;
+
+    historyList.prepend(historyItem);
+});
+
+    </script>
+    <script>
+    async function initYandexMap() {
+        await ymaps3.ready;
+
+        const {
+            YMap,
+            YMapDefaultSchemeLayer,
+            YMapDefaultFeaturesLayer,
+            YMapMarker
+        } = ymaps3;
+
+        const map = new YMap(
+            document.getElementById('yandexMap'),
+            {
+                location: {
+                    center: [34.9711, 44.8488],
+                    zoom: 14
+                }
+            }
+        );
+
+        map.addChild(new YMapDefaultSchemeLayer());
+        map.addChild(new YMapDefaultFeaturesLayer());
+        
+        const markerElement = document.createElement('div');
+
+        markerElement.textContent = '🌱 ';
+        markerElement.style.fontSize = '40px';
+        markerElement.style.width = '50px';
+        markerElement.style.height = '50px';
+        markerElement.style.display = 'flex';
+        markerElement.style.alignItems = 'center';
+        markerElement.style.justifyContent = 'center';
+        markerElement.onclick = function() {
+            showPoint('🌱  Место для посадки нового растения');
+        };
+
+        const point = new YMapMarker(
+            {
+                coordinates: [34.9711, 44.8488]
+            },
+            markerElement
+        );
+
+        map.addChild(point);
+        const markerElement2 = document.createElement('div');
+
+        markerElement2.textContent = '🌳';
+
+       markerElement2.onclick = function() {
+            showPoint('🌳  Место, где деревьям нужна забота');
+        };
+        markerElement2.style.fontSize = '40px';
+        markerElement2.style.width = '50px';
+        markerElement2.style.height = '50px';
+        markerElement2.style.display = 'flex';
+        markerElement2.style.alignItems = 'center';
+        markerElement2.style.justifyContent = 'center';
+        
+
+        const point2 = new YMapMarker(
+            {
+                coordinates: [34.9600, 44.8500]
+            },
+            markerElement2
+        );
+
+        map.addChild(point2);
+    }
+
+
+    </script>
+    </body>
+    </html>
