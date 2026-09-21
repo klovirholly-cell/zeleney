@@ -421,7 +421,25 @@
     </head>
 
     <body>
-
+    <div id="registrationScreen" class="registration-screen">
+        <div class="registration-card">
+            <div class="registration-logo">🌱</div>
+    
+            <h1>Добро пожаловать!</h1>
+    
+            <p>Давай познакомимся 💚</p>
+    
+            <input
+                type="text"
+                id="nameInput"
+                placeholder="Введи своё имя"
+            >
+    
+            <button onclick="registerUser()">
+                Продолжить
+            </button>
+        </div>
+    </div>
     <div class="app">
 
         <!-- ГЛАВНАЯ -->
@@ -682,7 +700,20 @@
 
 
     <script>
-
+    function registerUser() {
+        const name = document.getElementById('nameInput').value.trim();
+    
+        if (name === '') {
+            alert('Пожалуйста, введи своё имя 🌱');
+            return;
+        }
+    
+        localStorage.setItem('userName', name);
+    
+        document.getElementById('registrationScreen').style.display = 'none';
+    
+        alert('Добро пожаловать, ' + name + '! 💚');
+    }
     function addPlant() {
         let plantCount = document.getElementById('plantCount');
         let progressText = document.getElementById('progressText');
