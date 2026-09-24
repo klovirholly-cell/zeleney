@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+        <!DOCTYPE html>
     <html lang="ru">
     <script src="https://api-maps.yandex.ru/v3/?apikey=70e90cbd-0e35-4021-a977-7f696111a153&lang=ru_RU"></script>
     <head>
@@ -7,6 +7,61 @@
     <title>Зеленей</title>
 
     <style>
+    .registration-screen {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f4fff4;
+        z-index: 9999;
+    }
+
+    .registration-card {
+        width: 320px;
+        padding: 30px 25px;
+        background: white;
+        border-radius: 25px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .registration-logo {
+        font-size: 55px;
+        margin-bottom: 10px;
+    }
+
+    .registration-card h1 {
+        margin: 0 0 10px;
+        color: #28633b;
+    }
+
+    .registration-card p {
+        margin: 0 0 20px;
+        color: #5d8066;
+    }
+
+    .registration-card input {
+        width: 100%;
+        padding: 14px;
+        box-sizing: border-box;
+        border: 1px solid #c8d8c8;
+        border-radius: 14px;
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .registration-card button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 14px;
+        background: #6baa5b;
+        color: white;
+        font-size: 16px;
+    }
     * {
         box-sizing: border-box;
         margin: 0;
@@ -36,7 +91,20 @@
         min-height: calc(100vh - 75px);
         padding: 25px 20px 100px;
     }
-
+    #settingsScreen {
+        width: 390px;
+        max-width: 100vw;
+        min-height: 100vh;
+        box-sizing: border-box;
+        background: #f7faef;
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 25px 20px 100px;
+        z-index: 1000;
+        overflow-y: auto;
+    }
     .screen.active {
         display: block;
     }
@@ -77,13 +145,12 @@
         box-shadow: 0 5px 10px #aac69f;
     }
     .mascot-video {
-        width: 90px;
-        height: 90px;
-        object-fit: contain;
-        border: none;
-        border-radius: 20px;
-        background: transparent;
+        width: 190px;
+        height: 190px;
+        object-fit: cover;
+        border-radius: 28px;
         display: block;
+        margin: 0 auto;
     }
 
     .hello {
@@ -93,11 +160,12 @@
     }
 
     .card {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 18px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 14px rgba(80, 120, 70, 0.10);
+        background: linear-gradient(135deg, #F1F8EF, #E5F3E1);
+        border-radius: 24px;
+        padding: 20px;
+        margin: 18px 0;
+        box-shadow: 0 6px 18px rgba(76, 120, 70, 0.12);
+        border: 1px solid #D7EBD2;
     }
 
     .card h3 {
@@ -106,41 +174,72 @@
     }
 
     .progress {
-        height: 12px;
-        background: #e4eddF;
+        width: 100%;
+        height: 10px;
+        background: #D8EBD4;
         border-radius: 20px;
         overflow: hidden;
-        margin-top: 10px;
+        margin: 14px 0 8px;
     }
 
     .progress-bar {
-        width: 35%;
         height: 100%;
-        background: linear-gradient(90deg, #5d9b58, #83b96e);
+        width: 0%;
+        background: linear-gradient(90deg, #66BB6A, #2E7D32);
         border-radius: 20px;
+        transition: width 0.5s ease;
     }
 
     .actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
+        margin-top: 20px;
     }
 
     .action {
-        background: #ffffff;
+        min-height: 64px;
+        padding: 14px 12px;
         border: none;
-        border-radius: 20px;
-        padding: 20px 10px;
+        border-radius: 18px;
+        background: #FFFFFF;
+        color: #356B38;
         font-size: 14px;
-        color: #315f3b;
+        font-weight: 600;
+        box-shadow: 0 4px 14px rgba(76, 120, 70, 0.12);
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(80, 120, 70, 0.10);
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .action span {
+        display: block;
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 18px rgba(76, 120, 70, 0.18);
     }
 
     .action:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 15px rgba(80, 120, 70, 0.15);
+    }
+
+    .actions .action:last-child {
+        grid-column: 1 / -1;
+        background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+        color: #2E7D32;
+        font-size: 15px;
+        font-weight: 700;
+        border: 1px solid #B7DDB2;
+    }
+
+    .actions .action:last-child span {
+        display: inline;
+        margin-right: 6px;
+        font-size: 20px;
     }
 
     .action span {
@@ -225,6 +324,80 @@
         color: #879183;
         font-size: 12px;
         margin-top: 4px;
+    }
+
+    .history-arrow {
+        margin-left: auto;
+        font-size: 25px;
+        color: #9bb09a;
+        flex-shrink: 0;
+    }
+
+    .history-item {
+        cursor: pointer;
+    }
+    .history-details {
+        position: fixed;
+        z-index: 3000;
+        width: calc(100% - 40px);
+        max-width: 350px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #f7faef;
+        padding: 25px 20px;
+        border-radius: 28px;
+        box-shadow: 0 10px 35px rgba(50, 90, 50, 0.22);
+    }
+
+    .history-details h2 {
+        color: #315f3b;
+        font-size: 25px;
+        margin-bottom: 20px;
+    }
+
+    .history-details p {
+        background: white;
+        color: #71816d;
+        white-space: pre-line;
+        line-height: 1.6;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 4px 14px rgba(80, 120, 70, 0.10);
+        margin-bottom: 25px;
+    }
+
+    .history-details button {
+        width: 100%;
+        border: none;
+        background: #5d9b58;
+        color: white;
+        padding: 14px;
+        border-radius: 16px;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+    .history-details h2 {
+        color: #315f3b;
+        margin-bottom: 15px;
+    }
+
+    .history-details p {
+        color: #71816d;
+        white-space: pre-line;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    .history-details button {
+        border: none;
+        background: #5d9b58;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 15px;
+        font-size: 15px;
+        cursor: pointer;
     }
 
     /* Профиль */
@@ -417,6 +590,460 @@
     position: relative;
     z-index: 2;
 }
+
+    /* Окно добавления растения */
+.plant-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(49, 95, 59, 0.18);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: flex-end;
+    padding: 20px;
+    z-index: 2000;
+}
+
+.plant-modal-card {
+    width: 100%;
+    max-width: 390px;
+    background: #f7faef;
+    border-radius: 28px;
+    padding: 25px 20px 22px;
+    box-shadow: 0 -5px 30px rgba(50, 90, 50, 0.18);
+    position: relative;
+    animation: plantModalUp 0.25s ease;
+}
+
+@keyframes plantModalUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.plant-modal-icon {
+    width: 55px;
+    height: 55px;
+    background: #dcebd5;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.plant-modal-card h2 {
+    color: #315f3b;
+    font-size: 23px;
+    margin-bottom: 6px;
+}
+
+.plant-modal-card p {
+    color: #71816d;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.plant-modal-card select,
+.plant-modal-card input {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #d5e2d0;
+    border-radius: 15px;
+    padding: 0 15px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #315f3b;
+    background: white;
+    outline: none;
+}
+
+.plant-confirm {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 16px;
+    background: #5d9b58;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.plant-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 50%;
+    background: #e8f0e3;
+    color: #5d8066;
+    font-size: 22px;
+    cursor: pointer;
+}
+    /* Окно добавления растения */
+.plant-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(49, 95, 59, 0.18);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: flex-end;
+    padding: 20px;
+    z-index: 2000;
+}
+
+.plant-modal-card {
+    width: 100%;
+    max-width: 390px;
+    background: #f7faef;
+    border-radius: 28px;
+    padding: 25px 20px 22px;
+    box-shadow: 0 -5px 30px rgba(50, 90, 50, 0.18);
+    position: relative;
+    animation: plantModalUp 0.25s ease;
+}
+
+@keyframes plantModalUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.plant-modal-icon {
+    width: 55px;
+    height: 55px;
+    background: #dcebd5;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.plant-modal-card h2 {
+    color: #315f3b;
+    font-size: 23px;
+    margin-bottom: 6px;
+}
+
+.plant-modal-card p {
+    color: #71816d;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.plant-modal-card select,
+.plant-modal-card input {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #d5e2d0;
+    border-radius: 15px;
+    padding: 0 15px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #315f3b;
+    background: white;
+    outline: none;
+}
+
+.plant-confirm {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 16px;
+    background: #5d9b58;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.plant-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 50%;
+    background: #e8f0e3;
+    color: #5d8066;
+    font-size: 22px;
+    cursor: pointer;
+}
+    .city-task-card {
+        background: #ffffff;
+        padding: 18px;
+        border-radius: 20px;
+        margin: 20px 0;
+        box-shadow: 0 4px 14px rgba(80, 120, 70, 0.10);
+    }
+
+    .city-task-card h3 {
+        color: #315f3b;
+        margin-bottom: 10px;
+    }
+
+    .city-task-card p {
+        color: #71816d;
+        line-height: 1.5;
+    }
+
+    .task-reward {
+        margin-top: 15px;
+        color: #5d9b58;
+    }
+    .home-title {
+        text-align: center;
+        margin-bottom: 18px;
+    }
+
+    .home-title h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: #2E7D32;
+        text-shadow: 0 2px 4px rgba(76, 120, 70, 0.12);
+    }
+
+    .home-title p {
+        margin: 7px 0 0;
+        font-size: 16px;
+        color: #6f8f6b;
+    }
+    .plant-total {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        color: #557653;
+        font-size: 14px;
+    }
+
+    .plant-total #plantCount {
+        font-size: 30px;
+        font-weight: 800;
+        color: #2E7D32;
+    }
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #6F8F6B;
+        font-size: 13px;
+    }
+
+    #progressPercent {
+        font-weight: 700;
+        color: #2E7D32;
+    }
+    .main-action {
+        grid-column: 1 / -1;
+        min-height: 82px;
+        background: linear-gradient(135deg, #66BB6A, #43A047);
+        color: white;
+        border: 1px solid #2E7D32;
+        border-radius: 18px;
+        box-shadow: 0 6px 18px rgba(67, 160, 71, 0.25);
+    }
+
+    .main-action span {
+        display: inline;
+        font-size: 25px;
+        margin-right: 5px;
+    }
+
+    .main-action b {
+        font-size: 17px;
+    }
+
+    .main-action small {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+        font-weight: 400;
+        opacity: 0.9;
+    }
+    .zolik-tip {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        margin: 14px 0;
+        background: #F7FBF5;
+        border: 1px solid #E0EFDC;
+        border-radius: 18px;
+        color: #557653;
+    }
+
+    .zolik-tip > span {
+        font-size: 28px;
+    }
+
+    .zolik-tip b {
+        color: #2E7D32;
+        font-size: 14px;
+    }
+
+    .zolik-tip p {
+        margin: 3px 0 0;
+        font-size: 12px;
+    }
+    .achievement-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        margin: 12px 0;
+        background: #F1F1F1;
+        border-radius: 20px;
+        color: #999;
+        position: relative;
+    }
+
+    .achievement-card.completed {
+        background: #E8F5E9;
+        color: #356B38;
+    }
+
+    .achievement-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border-radius: 15px;
+        font-size: 25px;
+    }
+
+    .achievement-card h3 {
+        margin: 0 0 4px;
+        font-size: 16px;
+    }
+
+    .achievement-card p {
+        margin: 0;
+        font-size: 12px;
+    }
+
+    .achievement-check {
+        margin-left: auto;
+        font-size: 22px;
+        color: #43A047;
+        font-weight: bold;
+    }
+    .achievement-action {
+        background: #FFF8E1;
+        color: #7A6210;
+        border: 1px solid #F0D98A;
+    }
+    .map-action {
+        background: #E8F3FF;
+        color: #3478B5;
+        border: 1px solid #B9D8F2;
+    }
+
+    .camera-action {
+        background: #F3EFFF;
+        color: #7555A8;
+        border: 1px solid #D5C7EF;
+    }
+
+    .history-action {
+        background: #FFF1E6;
+        color: #B56A32;
+        border: 1px solid #F0CEB0;
+    }
+    .reward-total {
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid #D7EBD2;
+        color: #4F7F4B;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .reward-total span {
+        color: #2E7D32;
+        font-size: 16px;
+        font-weight: 800;
+    }
+    .home-title {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .ambassador {
+        margin-bottom: 18px;
+    }
+
+    .zolik-tip {
+        margin: 14px 0 18px;
+    }
+
+    .card {
+        margin: 18px 0;
+    }
+
+    .actions {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+        .home-title h1 {
+            font-size: 30px;
+        }
+
+        .home-title p {
+            font-size: 14px;
+        }
+
+        .ambassador {
+            padding: 14px;
+        }
+
+        .mascot-video {
+            width: 150px;
+            height: 150px;
+        }
+
+        .card {
+            padding: 18px;
+        }
+
+        .actions {
+            gap: 10px;
+        }
+
+        .action {
+            min-height: 60px;
+            padding: 12px 8px;
+            font-size: 13px;
+        }
+
+        .main-action {
+            min-height: 76px;
+        }
+    }
     </style>
     </head>
 
@@ -440,13 +1067,131 @@
             </button>
         </div>
     </div>
+    <div id="settingsScreen" class="screen" style="display: none;">
+        <h1>⚙️ Настройки</h1>
+
+        <div class="card" onclick="changeName()">
+            ✏️ Изменить имя
+        </div>
+
+        <div class="card" onclick="resetData()">
+            🔄 Сбросить данные
+        </div>
+
+        <button onclick="closeSettings()">
+            ← Назад
+        </button>
+    </div>
+
     <div class="app">
+
+        <!-- ОКНО ЗАДАНИЯ ГОРОДА -->
+        <div id="cityTaskModal" class="plant-modal">
+            <div class="plant-modal-card">
+
+                <button class="plant-close" onclick="closeCityTask()">×</button>
+
+                <div class="plant-modal-icon">🎯</div>
+
+                <h2>Задание города</h2>
+                <div id="cityTaskStatus" style="margin: 15px 0; color: #5d9b58;">
+                    🎁 Награда: <b>100 🌿</b>
+                </div>
+                <p>
+                    Помоги сделать город зеленее 🌱
+                </p>
+
+                <div class="city-task-card">
+                    <h3>🌳 Посади дерево</h3>
+
+                    <p>
+                        Посади дерево в выбранном месте и подтверди выполнение фотографией.
+                    </p>
+
+                    <div class="task-reward">
+                        🎁 Награда: <b>100 🌿</b>
+                    </div>
+                </div>
+
+                <button class="plant-confirm" onclick="startCityTask()">
+                    Выполнить задание 🌱
+                </button>
+
+            </div>
+        </div>
+
+        <!-- ОКНО ПОДТВЕРЖДЕНИЯ ЗАДАНИЯ -->
+<div id="taskProofModal" class="plant-modal">
+    <div class="plant-modal-card">
+
+        <button class="plant-close" onclick="closeTaskProof()">×</button>
+
+        <div class="plant-modal-icon">📷</div>
+
+        <h2>Подтвердить выполнение</h2>
+
+        <p>
+            Сделай фотографию посадки, чтобы отправить её на проверку 🌱
+        </p>
+
+        <input
+            type="file"
+            id="taskPhotoInput"
+            accept="image/*"
+            onchange="showTaskPhoto(this)"
+        >
+
+        <div id="taskPhotoPreview" style="margin: 15px 0; text-align: center; color: #5d9b58;">
+            Фото ещё не выбрано 📷
+        </div>
+
+        <button class="plant-confirm" onclick="submitTaskProof()">
+            Отправить на проверку 🌿
+        </button>
+
+    </div>
+</div>
+        <!-- ОКНО ДОБАВЛЕНИЯ РАСТЕНИЯ -->
+<div id="plantModal" class="plant-modal">
+
+    <div class="plant-modal-card">
+
+        <button class="plant-close" onclick="closePlantModal()">×</button>
+
+        <div class="plant-modal-icon">🌱</div>
+
+        <h2>Добавить растение</h2>
+        <p>Расскажи немного о своей посадке</p>
+
+        <select id="plantType">
+            <option value="">Выбери растение</option>
+            <option value="Дерево">🌳 Дерево</option>
+            <option value="Кустарник">🌿 Кустарник</option>
+            <option value="Цветы">🌷 Цветы</option>
+            <option value="Трава">🌱 Трава</option>
+        </select>
+
+        <input
+            type="text"
+            id="plantPlace"
+            placeholder="📍 Где посадила?"
+        >
+
+        <button class="plant-confirm" onclick="confirmPlant()">
+            Добавить 🌱
+        </button>
+
+    </div>
+
+</div>
 
         <!-- ГЛАВНАЯ -->
         <section id="home" class="screen active">
 
-            <h1>Привет! 🌱 </h1>
-            <p class="subtitle">Сделаем город немного зеленее?</p>
+            <div class="home-title">
+                <h1>ЭкоГрад 🌿</h1>
+                <p>Больше зелени — счастливее города!</p>
+            </div>
 
             <div class="ambassador">
 
@@ -461,40 +1206,64 @@
                 </div>
 
             </div>
-
+            <div class="zolik-tip">
+                <span>🌱</span>
+                <div>
+                    <b>Золик напоминает</b>
+                    <p>Каждое растение делает наш город зеленее 💚</p>
+                </div>
+            </div>
             <div class="card">
                 <h3>🌿  Твой вклад</h3>
 
-                <b><span id="plantCount">12</span> растений</b> уже добавлено
+                <div class="plant-total">
+                    <span id="plantCount">0</span>
+                    <span>растений уже добавлено</span>
+                </div>
 
                 <div class="progress">
                     <div class="progress-bar"></div>
                 </div>
 
-                <small id="progressText">12 / 50 до следующей цели</small>
-                <small id="progressPercent">24%</small>
+                <div class="progress-info">
+                    <small id="progressText">0 / 50 до следующей цели</small>
+                    <small id="progressPercent">0%</small>
+                </div>
             </div>
-
+            <div class="reward-total">
+                🌿 <span id="rewardPoints">0</span> баллов за задания
+            </div>
             <div class="actions">
 
-                <button class="action" onclick="addPlant()">
-        <span>🌱 </span>
-        Посадить растение
-    </button>
+                <button class="action main-action" onclick="openPlantModal()">
+                    <span>🌱</span>
+                    <b>Добавить растение</b>
+                    <small>Добавь новое растение в свой вклад</small>
+                </button>
 
-                <button class="action" onclick="showScreen('map')">
+                <button class="action map-action" onclick="showScreen('map')">
                         <span>📍  </span>
                         Найти место
                 </button>
 
-                <button class="action" onclick="showScreen('camera')">
+                <button class="action camera-action" onclick="showScreen('camera')">
                     <span>📷</span>
                     Сделать фото
                 </button>
 
-                <button class="action" onclick="showScreen('history')">
+                <button class="action history-action" onclick="showScreen('history')">
                     <span>📖 </span>
                     Моя история
+                </button>
+
+                <button class="action achievement-action" onclick="showAchievements()">
+                    <span>🏆</span>
+                    Достижения
+                </button>
+
+                <button class="action" onclick="openCityTask()">
+                    <span>🎯</span>
+                    Задания города
                 </button>
 
             </div>
@@ -604,7 +1373,45 @@
             </button>
         </div>
 
+        <!-- ДОСТИЖЕНИЯ -->
+<section id="achievements" class="screen">
 
+    <h1>Достижения 🏆</h1>
+    <p class="subtitle">Твои зелёные успехи</p>
+
+    <div class="achievement-card">
+        <div class="achievement-icon">🌱</div>
+        <div>
+            <h3>Первые шаги</h3>
+            <p>Добавь своё первое растение</p>
+        </div>
+    </div>
+
+    <div class="achievement-card">
+        <div class="achievement-icon">🌿</div>
+        <div>
+            <h3>Зелёный друг</h3>
+            <p>Добавь 10 растений</p>
+                </div>
+            </div>
+
+            <div class="achievement-card">
+                <div class="achievement-icon">🌳</div>
+                <div>
+                    <h3>Любитель природы</h3>
+                    <p>Добавь 50 растений</p>
+                </div>
+            </div>
+
+            <div class="achievement-card">
+                <div class="achievement-icon">🏆</div>
+                <div>
+                    <h3>Герой города</h3>
+                    <p>Добавь 100 растений</p>
+                </div>
+            </div>
+
+        </section>
         <!-- ПРОФИЛЬ -->
         <section id="profile" class="screen">
 
@@ -612,10 +1419,11 @@
 
                 <div class="avatar">🌱 </div>
 
-                <h1>Ира</h1>
+                <h1 id="profileUserName">Ира</h1>
 
                 <p class="subtitle">
-                    Зелёный друг города 💚             </p>
+                    Зелёный друг города 💚             
+                </p>
 
             </div>
 
@@ -623,7 +1431,7 @@
 
 
             <div class="stat">
-                    <strong id="profilePlantCount">12</strong>
+                    <strong id="profilePlantCount">0</strong>
                     <span>растений</span>
 
             </div>
@@ -631,6 +1439,11 @@
                 <div class="stat">
                     <strong id="pointCount">5</strong>
                     <span>точек</span>
+                </div>
+
+                <div class="stat">
+                    <strong id="rewardPoints">0</strong>
+                    <span>🌿 баллов</span>
                 </div>
 
                 <div class="stat">
@@ -651,15 +1464,15 @@
                 Ты уже делаешь город зеленее!
             </div>
 
-            <div class="card">
+            <div class="card" onclick="showMyPlants()">
                 🌳  Мои растения
             </div>
 
-            <div class="card">
+            <div class="card" onclick="showMyPoints()">
                 📍  Мои точки
             </div>
 
-            <div class="card">
+            <div class="card" onclick="openSettings()">
                 ⚙️  Настройки
             </div>
 
@@ -709,12 +1522,204 @@
         }
     
         localStorage.setItem('userName', name);
+
+        document.getElementById('profileUserName').textContent = name;
     
         document.getElementById('registrationScreen').style.display = 'none';
     
         alert('Добро пожаловать, ' + name + '! 💚');
     }
-    function addPlant() {
+    function registerUser() {
+        const name = document.getElementById('nameInput').value.trim();
+
+        if (name === '') {
+            alert('Пожалуйста, введи своё имя 🌱');
+            return;
+        }
+
+        localStorage.setItem('userName', name);
+
+        localStorage.setItem('plantCount', '0');
+        localStorage.setItem('pointCount', '0');
+        localStorage.setItem('photoCount', '0');
+        localStorage.removeItem('history');
+        localStorage.removeItem('savedPhoto');
+
+        document.getElementById('plantCount').textContent = '0';
+        document.getElementById('profilePlantCount').textContent = '0';
+        document.getElementById('pointCount').textContent = '0';
+        document.getElementById('photoCount').textContent = '0';
+
+        document.getElementById('profileUserName').textContent = name;
+
+        document.getElementById('registrationScreen').style.display = 'none';
+
+        alert('Добро пожаловать, ' + name + '! 💚');
+    }
+    function loadUser() {
+        const savedName = localStorage.getItem('userName');
+        const savedRewardPoints = localStorage.getItem('rewardPoints') || '0';
+        document.getElementById('rewardPoints').textContent = savedRewardPoints;
+
+        if (savedName) {
+            document.getElementById('profileUserName').textContent = savedName;
+            document.getElementById('registrationScreen').style.display = 'none';
+        }
+    }
+
+window.addEventListener('DOMContentLoaded', loadUser);
+    function openSettings() {
+        document.getElementById('settingsScreen').style.display = 'block';
+    }
+    function closeSettings() {
+        document.getElementById('settingsScreen').style.display = 'none';
+    }
+    function changeName() {
+        const newName = prompt('Введи новое имя 🌱');
+
+        if (newName === null) {
+            return;
+        }
+
+        const name = newName.trim();
+
+        if (name === '') {
+            alert('Имя не может быть пустым 💚');
+            return;
+        }
+
+        localStorage.setItem('userName', name);
+        document.getElementById('profileUserName').textContent = name;
+
+        alert('Имя изменено! 🌱');
+    }
+    function showMyPoints() {
+        const points = localStorage.getItem('pointCount') || '0';
+
+        alert('📍 Ты добавила точек: ' + points);
+    }
+    function showMyPlants() {
+        const plants = localStorage.getItem('plantCount') || '0';
+
+        alert('🌳 Ты посадила растений: ' + plants);
+    }
+    function resetData() {
+        const confirmReset = confirm(
+            'Точно сбросить все данные? 🌱\nИмя и статистика будут удалены.'
+        );
+
+        if (!confirmReset) {
+            return;
+        }
+
+        localStorage.clear();
+
+        // Сбрасываем статистику
+        document.getElementById('plantCount').textContent = '0';
+        document.getElementById('profilePlantCount').textContent = '0';
+        document.getElementById('pointCount').textContent = '0';
+        document.getElementById('photoCount').textContent = '0';
+
+        // Сбрасываем прогресс
+        document.getElementById('progressText').textContent = '0 / 50 до следующей цели';
+        document.getElementById('progressPercent').textContent = '0%';
+        document.querySelector('.progress-bar').style.width = '0%';
+
+        // Показываем регистрацию заново
+        document.getElementById('registrationScreen').style.display = 'flex';
+        document.getElementById('nameInput').value = '';
+        document.getElementById('profileUserName').textContent = 'Пользователь';
+
+        alert('Данные сброшены 💚');
+    }
+    function openCityTask() {
+        document.getElementById('cityTaskModal').style.display = 'flex';
+    }
+
+    function closeCityTask() {
+        document.getElementById('cityTaskModal').style.display = 'none';
+    }
+
+    function startCityTask() {
+        closeCityTask();
+
+        document.getElementById('taskProofModal').style.display = 'flex';
+    }
+
+    function closeTaskProof() {
+        document.getElementById('taskProofModal').style.display = 'none';
+    }
+    function showTaskPhoto(input) {
+        const preview = document.getElementById('taskPhotoPreview');
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            preview.innerHTML = `
+                📷 <b>Фото выбрано</b><br>
+                <small>${file.name}</small>
+            `;
+        }
+    }
+    function submitTaskProof() {
+        const input = document.getElementById('taskPhotoInput');
+
+        if (input.files.length === 0) {
+            alert('Сначала добавь фотографию 🌱');
+            return;
+        }
+
+        // Получаем текущие баллы
+        let points = Number(localStorage.getItem('pointCount')) || 0;
+
+        // Добавляем награду
+        points += 100;
+
+        // Сохраняем новые баллы
+        localStorage.setItem('pointCount', points);
+
+        // Показываем баллы в профиле
+        const pointElement = document.getElementById('pointCount');
+
+        if (pointElement) {
+            pointElement.textContent = points;
+        }
+
+        closeTaskProof();
+
+        alert('Задание выполнено! 🎉\nТы получила +100 🌿');
+
+        localStorage.setItem('cityTaskStatus', 'completed');
+    }
+        function openPlantModal() {
+        document.getElementById('plantModal').style.display = 'flex';
+    }
+
+    function closePlantModal() {
+        document.getElementById('plantModal').style.display = 'none';
+    }
+    function confirmPlant() {
+        const plantType = document.getElementById('plantType').value;
+        const plantPlace = document.getElementById('plantPlace').value.trim();
+
+        if (!plantType) {
+            alert('Выбери растение 🌱');
+            return;
+        }
+
+        if (!plantPlace) {
+            alert('Напиши, где посадила 📍');
+            return;
+        }
+
+        addPlant(plantType, plantPlace);
+
+        document.getElementById('plantType').value = '';
+        document.getElementById('plantPlace').value = '';
+
+        closePlantModal();
+    }
+    function addPlant(plantType = 'Растение', plantPlace = 'Только что') {
         let plantCount = document.getElementById('plantCount');
         let progressText = document.getElementById('progressText');
         let progressPercent = document.getElementById('progressPercent');
@@ -735,10 +1740,16 @@
             progressPercent.textContent = percent + '%';
             progressBar.style.width = percent + '%';
         }
+
         if (!window.helpingPoint) {
-            addHistory('🌳  ', 'Посадила растение', 'Только что');
+            addHistory(
+                '🌱',
+                'Посадила: ' + plantType,
+                '📍 ' + plantPlace
+            );
         }
-        alert('Растение добавлено! 🌱 💚 ');
+
+        alert('Растение добавлено! 🌱💚');
     }
     function showScreen(screenName) {
 
@@ -773,6 +1784,10 @@
                 initYandexMap();
             }, 100);
         }
+    }
+    function showAchievements() {
+        updateAchievements();
+        showScreen('achievements');
     }
     function showPoint(message) {
         let pointCount = document.getElementById('pointCount');
@@ -848,14 +1863,20 @@
         let item = document.createElement('div');
         item.className = 'history-item';
 
-        item.setAttribute('onclick', "showHistoryDetails('plant')");
+        item.setAttribute(
+            'onclick',
+            `showHistoryDetails('plant', '${title}', '${place}')`
+        );
 
         item.innerHTML = `
             <div class="history-icon">${icon}</div>
+
             <div>
                 <h4>${title}</h4>
                 <p>${place}</p>
             </div>
+
+            <div class="history-arrow">›</div>
         `;
 
         historyList.prepend(item);
@@ -864,20 +1885,22 @@
         history.unshift({
             icon: icon,
             title: title,
-            place: place
+            place: place,
+            date: new Date().toLocaleDateString('ru-RU')
         });
 
         localStorage.setItem('history', JSON.stringify(history));
     }
-function showHistoryDetails(type) {
+function showHistoryDetails(type, plantType, plantPlace) {
     let details = document.getElementById('historyDetails');
-    console.log(details);
     let title = document.getElementById('historyDetailsTitle');
     let text = document.getElementById('historyDetailsText');
 
     if (type === 'plant') {
-        title.textContent = '🌳 Посадила растение';
-        text.textContent = 'Сегодня · Сквер\n\nЗдесь ты посадила новое растение и помогла сделать город зеленее! 🌱💚';
+        title.textContent = '🌱 ' + plantType;
+        text.textContent =
+            '📍 ' + plantPlace +
+            '\n\nТы посадила это растение и помогла сделать город зеленее! 💚';
     }
 
     details.style.display = 'block';
@@ -954,6 +1977,11 @@ uniqueHistory.forEach(item => {
     let historyItem = document.createElement('div');
     historyItem.className = 'history-item';
 
+    historyItem.setAttribute(
+        'onclick',
+        `showHistoryDetails('plant', '${item.title}', '${item.place}')`
+    );
+
     historyItem.innerHTML = `
         <div class="history-icon">${item.icon}</div>
         <div>
@@ -964,7 +1992,34 @@ uniqueHistory.forEach(item => {
 
     historyList.prepend(historyItem);
 });
+    function updateAchievements() {
+        const plantCount = Number(localStorage.getItem('plantCount')) || 0;
 
+        const achievements = document.querySelectorAll('.achievement-card');
+
+        achievements.forEach(card => {
+            card.classList.remove('completed');
+
+            const oldCheck = card.querySelector('.achievement-check');
+            if (oldCheck) {
+                oldCheck.remove();
+            }
+        });
+
+        const goals = [1, 10, 50, 100];
+
+        achievements.forEach((card, index) => {
+            if (plantCount >= goals[index]) {
+                card.classList.add('completed');
+
+                const check = document.createElement('span');
+                check.className = 'achievement-check';
+                check.textContent = '✓';
+
+                card.appendChild(check);
+            }
+        });
+    }
     </script>
     <script>
     async function initYandexMap() {
@@ -1036,7 +2091,6 @@ uniqueHistory.forEach(item => {
         map.addChild(point2);
     }
 
-
-    </script>
+    
     </body>
     </html>
