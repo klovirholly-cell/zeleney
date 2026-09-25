@@ -1,9 +1,10 @@
         <!DOCTYPE html>
     <html lang="ru">
-    <script src="https://api-maps.yandex.ru/v3/?apikey=70e90cbd-0e35-4021-a977-7f696111a153&lang=ru_RU"></script>
+    
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://api-maps.yandex.ru/v3/?apikey=70e90cbd-0e35-4021-a977-7f696111a153&lang=ru_RU"></script>
     <title>Зеленей</title>
 
     <style>
@@ -253,15 +254,11 @@
     .map {
         height: 430px;
         border-radius: 25px;
-        background:
-            linear-gradient(30deg, transparent 45%, #d5dfca 46%, #d5dfca 48%, transparent 49%),
-            linear-gradient(120deg, transparent 45%, #d5dfca 46%, #d5dfca 48%, transparent 49%),
-            #e9eee2;
+        background: #e9eee2;
         position: relative;
         overflow: hidden;
         box-shadow: 0 4px 14px rgba(80, 120, 70, 0.12);
     }
-
     .point {
         position: absolute;
         width: 45px;
@@ -1044,6 +1041,152 @@
             min-height: 76px;
         }
     }
+    .profile-header {
+        position: relative;
+        text-align: center;
+        padding: 10px 0 20px;
+    }
+
+    .avatar {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+        border: 3px solid #A5D6A7;
+        border-radius: 50%;
+        font-size: 42px;
+        box-shadow: 0 5px 15px rgba(76, 120, 70, 0.15);
+    }
+
+    .profile-edit {
+        position: absolute;
+        right: 15px;
+        top: 5px;
+        width: 38px;
+        height: 38px;
+        border: 1px solid #C8E6C9;
+        border-radius: 50%;
+        background: white;
+        cursor: pointer;
+        font-size: 17px;
+    }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 10px 0 20px;
+    }
+
+    .stat {
+        padding: 16px 10px;
+        text-align: center;
+        background: #F7FBF5;
+        border: 1px solid #DCEFD8;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(76, 120, 70, 0.08);
+    }
+
+    .stat strong {
+        display: block;
+        font-size: 25px;
+        font-weight: 800;
+        color: #2E7D32;
+        margin-bottom: 4px;
+    }
+
+    .stat span {
+        font-size: 12px;
+        color: #6F8F6B;
+    }
+    .profile-progress {
+        background: linear-gradient(135deg, #E8F5E9, #F5FAF3);
+        border: 1px solid #C8E6C9;
+        border-radius: 22px;
+        padding: 20px;
+        margin: 18px 0;
+        box-shadow: 0 5px 15px rgba(76, 120, 70, 0.10);
+    }
+
+    .profile-progress-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .profile-progress-title b {
+        color: #2E7D32;
+        font-size: 17px;
+    }
+    .profile-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 17px 18px;
+        margin: 12px 0;
+        background: #FFFFFF;
+        border: 1px solid #E0EDE0;
+        border-radius: 18px;
+        color: #456B43;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(76, 120, 70, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .profile-menu-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(76, 120, 70, 0.12);
+    }
+
+    .menu-icon {
+        font-size: 23px;
+    }
+
+    .menu-arrow {
+        margin-left: auto;
+        font-size: 25px;
+        color: #8BA889;
+    }
+    .profile-achievements {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        margin: 14px 0;
+        background: linear-gradient(135deg, #FFF8E1, #FFFDF3);
+        border: 1px solid #F0D98A;
+        border-radius: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(180, 150, 50, 0.08);
+    }
+
+    .profile-achievements > div {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .achievement-mini-icon {
+        font-size: 28px;
+    }
+
+    .profile-achievements b {
+        display: block;
+        color: #7A6210;
+        font-size: 15px;
+    }
+
+    .profile-achievements small {
+        display: block;
+        margin-top: 3px;
+        color: #9A8750;
+        font-size: 11px;
+    }
     </style>
     </head>
 
@@ -1213,8 +1356,10 @@
                     <p>Каждое растение делает наш город зеленее 💚</p>
                 </div>
             </div>
-            <div class="card">
-                <h3>🌿  Твой вклад</h3>
+            <div class="profile-progress">
+                <div class="profile-progress-title">
+                    <b>🌿 Твой прогресс</b>
+                </div>
 
                 <div class="plant-total">
                     <span id="plantCount">0</span>
@@ -1417,7 +1562,13 @@
 
             <div class="profile-header">
 
-                <div class="avatar">🌱 </div>
+                <div class="avatar">
+    🌱
+                </div>
+
+                <button class="profile-edit" onclick="openSettings()">
+                    ✏️
+                </button>
 
                 <h1 id="profileUserName">Ира</h1>
 
@@ -1453,27 +1604,55 @@
 
             </div>
 
-            <div class="card">
-                🌿  <b>Твой прогресс</b>
+            <div class="profile-progress">
 
-                <div class="progress">
-                    <div class="progress-bar"></div>
+    <div class="profile-progress-title">
+        <b>🌿 Твой прогресс</b>
+    </div>
+
+    <div class="plant-total">
+        <span id="profileProgressCount">0</span>
+        <span>растений добавлено</span>
+    </div>
+
+    <div class="progress">
+        <div id="profileProgressBar" class="progress-bar"></div>
+    </div>
+
+    <div class="progress-info">
+        <small id="profileProgressText">0 / 50 до следующей цели</small>
+        <small id="profileProgressPercent">0%</small>
+    </div>
+
+</div>
+                        <div class="profile-achievements" onclick="showAchievements()">
+                <div>
+                    <span class="achievement-mini-icon">🏆</span>
+                    <div>
+                        <b>Мои достижения</b>
+                        <small>Посмотри свои зелёные успехи</small>
+                    </div>
                 </div>
 
-                <br>
-                Ты уже делаешь город зеленее!
+                <span class="menu-arrow">›</span>
             </div>
 
-            <div class="card" onclick="showMyPlants()">
-                🌳  Мои растения
+            <div class="profile-menu-item" onclick="showMyPlants()">
+                <span class="menu-icon">🌳</span>
+                <span>Мои растения</span>
+                <span class="menu-arrow">›</span>
             </div>
 
-            <div class="card" onclick="showMyPoints()">
-                📍  Мои точки
+            <div class="profile-menu-item" onclick="showMyPoints()">
+                <span class="menu-icon">📍</span>
+                <span>Мои точки</span>
+                <span class="menu-arrow">›</span>
             </div>
 
-            <div class="card" onclick="openSettings()">
-                ⚙️  Настройки
+            <div class="profile-menu-item" onclick="openSettings()">
+                <span class="menu-icon">⚙️</span>
+                <span>Настройки</span>
+                <span class="menu-arrow">›</span>
             </div>
 
         </section>
@@ -1559,7 +1738,9 @@
     function loadUser() {
         const savedName = localStorage.getItem('userName');
         const savedRewardPoints = localStorage.getItem('rewardPoints') || '0';
-        document.getElementById('rewardPoints').textContent = savedRewardPoints;
+        document.querySelectorAll('#rewardPoints').forEach(element => {
+            element.textContent = savedRewardPoints;
+        });
 
         if (savedName) {
             document.getElementById('profileUserName').textContent = savedName;
@@ -1612,6 +1793,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
+        // Полностью очищаем сохранённые данные
         localStorage.clear();
 
         // Сбрасываем статистику
@@ -1620,19 +1802,67 @@ window.addEventListener('DOMContentLoaded', loadUser);
         document.getElementById('pointCount').textContent = '0';
         document.getElementById('photoCount').textContent = '0';
 
+        // Сбрасываем баллы
+        document.querySelectorAll('#rewardPoints').forEach(element => {
+            element.textContent = '0';
+        });
+
         // Сбрасываем прогресс
-        document.getElementById('progressText').textContent = '0 / 50 до следующей цели';
+        document.getElementById('progressText').textContent =
+            '0 / 50 до следующей цели';
+
         document.getElementById('progressPercent').textContent = '0%';
-        document.querySelector('.progress-bar').style.width = '0%';
+
+        document.querySelectorAll('.progress-bar').forEach(bar => {
+            bar.style.width = '0%';
+        });
+
+        // Сбрасываем статус задания
+        const statusElement = document.getElementById('cityTaskStatus');
+
+        if (statusElement) {
+            statusElement.innerHTML = '🎁 Награда: <b>100 🌿</b>';
+        }
+
+        const taskButton =
+            document.querySelector('#cityTaskModal .plant-confirm');
+
+        if (taskButton) {
+            taskButton.textContent = 'Выполнить задание 🌱';
+            taskButton.disabled = false;
+            taskButton.style.opacity = '1';
+            taskButton.style.cursor = 'pointer';
+        }
 
         // Показываем регистрацию заново
         document.getElementById('registrationScreen').style.display = 'flex';
         document.getElementById('nameInput').value = '';
         document.getElementById('profileUserName').textContent = 'Пользователь';
 
-        alert('Данные сброшены 💚');
+        alert('Все данные сброшены 💚');
     }
     function openCityTask() {
+        const status = localStorage.getItem('cityTaskStatus');
+
+        const statusElement = document.getElementById('cityTaskStatus');
+        const taskButton = document.querySelector('#cityTaskModal .plant-confirm');
+
+        if (status === 'completed') {
+            statusElement.innerHTML = '✅ Задание уже выполнено!';
+
+            taskButton.textContent = 'Задание выполнено 🌿';
+            taskButton.disabled = true;
+            taskButton.style.opacity = '0.6';
+            taskButton.style.cursor = 'default';
+        } else {
+            statusElement.innerHTML = '🎁 Награда: <b>100 🌿</b>';
+
+            taskButton.textContent = 'Выполнить задание 🌱';
+            taskButton.disabled = false;
+            taskButton.style.opacity = '1';
+            taskButton.style.cursor = 'pointer';
+        }
+
         document.getElementById('cityTaskModal').style.display = 'flex';
     }
 
@@ -1664,34 +1894,40 @@ window.addEventListener('DOMContentLoaded', loadUser);
     function submitTaskProof() {
         const input = document.getElementById('taskPhotoInput');
 
-        if (input.files.length === 0) {
+        if (!input || input.files.length === 0) {
             alert('Сначала добавь фотографию 🌱');
             return;
         }
 
-        // Получаем текущие баллы
-        let points = Number(localStorage.getItem('pointCount')) || 0;
-
-        // Добавляем награду
-        points += 100;
-
-        // Сохраняем новые баллы
-        localStorage.setItem('pointCount', points);
-
-        // Показываем баллы в профиле
-        const pointElement = document.getElementById('pointCount');
-
-        if (pointElement) {
-            pointElement.textContent = points;
+        // Проверяем, не было ли задание уже выполнено
+        if (localStorage.getItem('cityTaskStatus') === 'completed') {
+            alert('Это задание уже выполнено 🌿');
+            closeTaskProof();
+            return;
         }
+
+        // Получаем текущие баллы
+        let rewardPoints = Number(localStorage.getItem('rewardPoints')) || 0;
+
+        // Начисляем награду только один раз
+        rewardPoints += 100;
+
+        // Сохраняем баллы
+        localStorage.setItem('rewardPoints', rewardPoints);
+
+        // Обновляем баллы на главной и в профиле
+        document.querySelectorAll('#rewardPoints').forEach(element => {
+            element.textContent = rewardPoints;
+        });
+
+        // Помечаем задание выполненным
+        localStorage.setItem('cityTaskStatus', 'completed');
 
         closeTaskProof();
 
         alert('Задание выполнено! 🎉\nТы получила +100 🌿');
-
-        localStorage.setItem('cityTaskStatus', 'completed');
     }
-        function openPlantModal() {
+            function openPlantModal() {
         document.getElementById('plantModal').style.display = 'flex';
     }
 
@@ -1730,15 +1966,29 @@ window.addEventListener('DOMContentLoaded', loadUser);
         if (count < 50) {
             count = count + 1;
 
-            plantCount.textContent = count;
-            localStorage.setItem('plantCount', count);
-            document.getElementById('profilePlantCount').textContent = count;
-
             let percent = Math.round(count / 50 * 100);
 
-            progressText.textContent = count + ' / 50 до следующей цели';
-            progressPercent.textContent = percent + '%';
-            progressBar.style.width = percent + '%';
+            plantCount.textContent = count;
+            localStorage.setItem('plantCount', count);
+
+            document.getElementById('profilePlantCount').textContent = count;
+
+            document.getElementById('profileProgressCount').textContent = count;
+            document.getElementById('profileProgressText').textContent =
+                count + ' / 50 до следующей цели';
+            document.getElementById('profileProgressPercent').textContent =
+                percent + '%';
+            document.getElementById('profileProgressBar').style.width =
+                percent + '%';
+
+            progressText.textContent =
+                count + ' / 50 до следующей цели';
+
+            progressPercent.textContent =
+                percent + '%';
+
+            progressBar.style.width =
+                percent + '%';
         }
 
         if (!window.helpingPoint) {
@@ -1770,6 +2020,37 @@ window.addEventListener('DOMContentLoaded', loadUser);
         navButtons.forEach(button => {
             button.classList.remove('active');
         });
+
+        if (screenName === 'history') {
+            let historyList = document.getElementById('historyList');
+            let history = JSON.parse(localStorage.getItem('history')) || [];
+
+            historyList.innerHTML = '';
+
+            history.forEach(item => {
+                let element = document.createElement('div');
+                element.className = 'history-item';
+
+                element.setAttribute(
+                    'onclick',
+                    `showHistoryDetails('plant', '${item.title}', '${item.place}')`
+                );
+
+                element.innerHTML = `
+                    <div class="history-icon">${item.icon}</div>
+
+                    <div>
+                        <h4>${item.title}</h4>
+                        <p>${item.place}</p>
+                        <small>${item.date || ''} ${item.time || ''}</small>
+                    </div>
+
+                    <div class="history-arrow">›</div>
+                `;
+
+                historyList.appendChild(element);
+            });
+        }
 
 
         // Выделяем текущую кнопку
@@ -1874,19 +2155,28 @@ window.addEventListener('DOMContentLoaded', loadUser);
             <div>
                 <h4>${title}</h4>
                 <p>${place}</p>
+                <small>${new Date().toLocaleDateString('ru-RU')} · ${new Date().toLocaleTimeString('ru-RU', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}</small>
             </div>
 
             <div class="history-arrow">›</div>
         `;
 
         historyList.prepend(item);
+
         let history = JSON.parse(localStorage.getItem('history')) || [];
 
         history.unshift({
             icon: icon,
             title: title,
             place: place,
-            date: new Date().toLocaleDateString('ru-RU')
+            date: new Date().toLocaleDateString('ru-RU'),
+            time: new Date().toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit'
+            })
         });
 
         localStorage.setItem('history', JSON.stringify(history));
@@ -2028,68 +2318,41 @@ uniqueHistory.forEach(item => {
         const {
             YMap,
             YMapDefaultSchemeLayer,
-            YMapDefaultFeaturesLayer,
-            YMapMarker
+            YMapDefaultFeaturesLayer
         } = ymaps3;
 
-        const map = new YMap(
-            document.getElementById('yandexMap'),
+        const mapContainer = document.getElementById('yandexMap');
+
+        if (!mapContainer) {
+            console.log('Контейнер карты не найден');
+            return;
+        }
+
+        if (window.ecoMap) {
+            window.ecoMap.destroy();
+        }
+
+        window.ecoMap = new YMap(
+            mapContainer,
             {
                 location: {
-                    center: [34.9711, 44.8488],
-                    zoom: 14
+                    center: [38.9753, 45.0355],
+                    zoom: 12
                 }
             }
         );
 
-        map.addChild(new YMapDefaultSchemeLayer());
-        map.addChild(new YMapDefaultFeaturesLayer());
-        
-        const markerElement = document.createElement('div');
-
-        markerElement.textContent = '🌱 ';
-        markerElement.style.fontSize = '40px';
-        markerElement.style.width = '50px';
-        markerElement.style.height = '50px';
-        markerElement.style.display = 'flex';
-        markerElement.style.alignItems = 'center';
-        markerElement.style.justifyContent = 'center';
-        markerElement.onclick = function() {
-            showPoint('🌱  Место для посадки нового растения');
-        };
-
-        const point = new YMapMarker(
-            {
-                coordinates: [34.9711, 44.8488]
-            },
-            markerElement
+        window.ecoMap.addChild(
+            new YMapDefaultSchemeLayer()
         );
 
-        map.addChild(point);
-        const markerElement2 = document.createElement('div');
-
-        markerElement2.textContent = '🌳';
-
-       markerElement2.onclick = function() {
-            showPoint('🌳  Место, где деревьям нужна забота');
-        };
-        markerElement2.style.fontSize = '40px';
-        markerElement2.style.width = '50px';
-        markerElement2.style.height = '50px';
-        markerElement2.style.display = 'flex';
-        markerElement2.style.alignItems = 'center';
-        markerElement2.style.justifyContent = 'center';
-        
-
-        const point2 = new YMapMarker(
-            {
-                coordinates: [34.9600, 44.8500]
-            },
-            markerElement2
+        window.ecoMap.addChild(
+            new YMapDefaultFeaturesLayer()
         );
 
-        map.addChild(point2);
+        console.log('Яндекс Карта загружена 🌿');
     }
+</script>
 
     
     </body>
