@@ -2087,12 +2087,14 @@ window.addEventListener('DOMContentLoaded', loadUser);
         document.getElementById('pointCard').style.display = 'none';
     }
     function helpPoint() {
-        const pointName = document.getElementById('pointCard').dataset.pointName;
+        const pointName =
+            document.getElementById('pointCard').dataset.pointName;
 
         let completedPoints =
             JSON.parse(localStorage.getItem('completedPoints')) || [];
 
         if (!completedPoints.includes(pointName)) {
+
             completedPoints.push(pointName);
 
             localStorage.setItem(
@@ -2112,13 +2114,28 @@ window.addEventListener('DOMContentLoaded', loadUser);
                 pointName
             );
 
+            const markers =
+                document.querySelectorAll('[data-point-title]');
+
+            markers.forEach(marker => {
+
+                if (marker.dataset.pointTitle === pointName) {
+
+                    const icon = marker.querySelector('div');
+
+                    if (icon) {
+                        icon.textContent = '✅';
+                    }
+                }
+            });
+
             alert('Ты помогла озеленению этого места! 🌱💚');
+
         } else {
+
             alert('Ты уже помогла этому месту! ✅💚');
         }
-        if (window.ecoMap) {
-            initYandexMap();
-        }
+
         closePointCard();
     }
     function handlePhoto() {
@@ -2396,6 +2413,7 @@ uniqueHistory.forEach(item => {
         points.forEach(point => {
 
             const markerElement = document.createElement('div');
+            markerElement.dataset.pointTitle = point.title;
             const completedPoints =
                 JSON.parse(localStorage.getItem('completedPoints')) || [];
 
@@ -2442,6 +2460,7 @@ uniqueHistory.forEach(item => {
             );
 
             window.ecoMap.addChild(marker);
+            markerElement.dataset.marker = 'true';
         });
 
         console.log('Яндекс Карта загружена 🌿');
