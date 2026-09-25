@@ -2095,7 +2095,9 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         window.helpingPoint = false;
 
-        addHistory('🌱 ', 'Помогла озеленению', pointName);
+        addHistory('🌱', 'Помогла озеленению', pointName);
+
+        alert('Ты помогла озеленению этого места! 🌱💚');
 
         closePointCard();
     }
@@ -2350,20 +2352,23 @@ uniqueHistory.forEach(item => {
         window.ecoMap.addChild(
             new YMapDefaultFeaturesLayer()
         );
-                const points = [
+        const points = [
             {
                 title: '🌳 Сквер — посадка деревьев',
                 text: 'Здесь можно помочь озеленению Судака.',
+                action: 'Посади дерево и добавь его в свой экологический прогресс.',
                 coordinates: [34.9742, 44.8500]
             },
             {
                 title: '🌱 Зона озеленения',
                 text: 'Место, где можно посадить растение и сделать город зеленее.',
+                action: 'Добавь растение в свой экологический прогресс.',
                 coordinates: [34.9800, 44.8480]
             },
             {
                 title: '💚 Экологическая акция',
                 text: 'Здесь проходят экологические мероприятия.',
+                action: 'Прими участие в экологической акции.',
                 coordinates: [34.9680, 44.8530]
             }
         ];
@@ -2390,10 +2395,16 @@ uniqueHistory.forEach(item => {
                 </div>
             `;
 
-            markerElement.onclick = () => {
-                document.getElementById('pointMessage').textContent = point.text;
+           markerElement.onclick = () => {
+                document.getElementById('pointMessage').textContent =
+                    point.title + '\n\n' +
+                    point.text + '\n\n' +
+                    'Что можно сделать: ' +
+                    point.action;
+
                 document.getElementById('pointCard').style.display = 'block';
-                document.getElementById('pointCard').dataset.pointName = point.text;
+
+                document.getElementById('pointCard').dataset.pointName = point.title;
             };
 
             const marker = new ymaps3.YMapMarker(
