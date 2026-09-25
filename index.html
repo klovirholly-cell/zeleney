@@ -2349,7 +2349,57 @@ uniqueHistory.forEach(item => {
         window.ecoMap.addChild(
             new YMapDefaultFeaturesLayer()
         );
+                const points = [
+            {
+                title: '🌳 Сквер — посадка деревьев',
+                text: 'Здесь можно помочь озеленению Судака.',
+                coordinates: [34.9742, 44.8500]
+            },
+            {
+                title: '🌱 Зона озеленения',
+                text: 'Место, где можно посадить растение и сделать город зеленее.',
+                coordinates: [34.9800, 44.8480]
+            },
+            {
+                title: '💚 Экологическая акция',
+                text: 'Здесь проходят экологические мероприятия.',
+                coordinates: [34.9680, 44.8530]
+            }
+        ];
 
+        points.forEach(point => {
+            const markerElement = document.createElement('button');
+
+            markerElement.textContent = '🌱';
+
+            markerElement.style.fontSize = '30px';
+            markerElement.style.background = 'white';
+            markerElement.style.border = '2px solid #6b9b5a';
+            markerElement.style.borderRadius = '50%';
+            markerElement.style.width = '50px';
+            markerElement.style.height = '50px';
+            markerElement.style.cursor = 'pointer';
+            markerElement.style.display = 'flex';
+            markerElement.style.alignItems = 'center';
+            markerElement.style.justifyContent = 'center';
+            markerElement.style.boxShadow = '0 3px 8px rgba(0,0,0,0.2)';
+
+            markerElement.onclick = () => {
+                document.getElementById('pointMessage').textContent = point.text;
+                document.getElementById('pointCard').style.display = 'block';
+            };
+
+            const marker = new ymaps3.YMapMarker(
+                {
+                    coordinates: point.coordinates
+                },
+                markerElement
+            );
+
+            window.ecoMap.addChild(marker);
+
+            });
+            
         console.log('Яндекс Карта загружена 🌿');
     }
 </script>
