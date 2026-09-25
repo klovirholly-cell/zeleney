@@ -2369,37 +2369,43 @@ uniqueHistory.forEach(item => {
         ];
 
         points.forEach(point => {
-            const markerElement = document.createElement('button');
 
-            markerElement.textContent = '🌱';
+            const markerElement = document.createElement('div');
 
-            markerElement.style.fontSize = '30px';
-            markerElement.style.background = 'white';
-            markerElement.style.border = '2px solid #6b9b5a';
-            markerElement.style.borderRadius = '50%';
-            markerElement.style.width = '50px';
-            markerElement.style.height = '50px';
-            markerElement.style.cursor = 'pointer';
-            markerElement.style.display = 'flex';
-            markerElement.style.alignItems = 'center';
-            markerElement.style.justifyContent = 'center';
-            markerElement.style.boxShadow = '0 3px 8px rgba(0,0,0,0.2)';
+            markerElement.innerHTML = `
+                <div style="
+                    width: 46px;
+                    height: 46px;
+                    background: white;
+                    border: 3px solid #5d9b58;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 28px;
+                    cursor: pointer;
+                    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+                ">
+                    🌱
+                </div>
+            `;
 
             markerElement.onclick = () => {
                 document.getElementById('pointMessage').textContent = point.text;
                 document.getElementById('pointCard').style.display = 'block';
+                document.getElementById('pointCard').dataset.pointName = point.text;
             };
 
-            const marker = new YMapMarker(
+            const marker = new ymaps3.YMapMarker(
                 {
-                    coordinates: point.coordinates
+                    coordinates: point.coordinates,
+                    zIndex: 1000
                 },
                 markerElement
             );
 
             window.ecoMap.addChild(marker);
-
-            });
+        });
 
         console.log('Яндекс Карта загружена 🌿');
     }
