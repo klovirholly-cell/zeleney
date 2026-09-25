@@ -2113,6 +2113,9 @@ window.addEventListener('DOMContentLoaded', loadUser);
                 'Помогла озеленению',
                 pointName
             );
+            if (window.selectedMarkerContent) {
+                window.selectedMarkerContent.textContent = '✅';
+            }
 
             const markers =
                 document.querySelectorAll('[data-point-title]');
@@ -2421,25 +2424,28 @@ uniqueHistory.forEach(item => {
 
             const markerIcon = isCompleted ? '✅' : '🌱';
 
-            markerElement.innerHTML = `
-                <div style="
-                    width: 46px;
-                    height: 46px;
-                    background: white;
-                    border: 3px solid #5d9b58;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 28px;
-                    cursor: pointer;
-                    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-                ">
-                    ${markerIcon}
-                </div>
-            `;
+            const markerContent = document.createElement('div');
+
+            markerContent.style.width = '46px';
+            markerContent.style.height = '46px';
+            markerContent.style.background = 'white';
+            markerContent.style.border = '3px solid #5d9b58';
+            markerContent.style.borderRadius = '50%';
+            markerContent.style.display = 'flex';
+            markerContent.style.alignItems = 'center';
+            markerContent.style.justifyContent = 'center';
+            markerContent.style.fontSize = '28px';
+            markerContent.style.cursor = 'pointer';
+            markerContent.style.boxShadow = '0 3px 10px rgba(0,0,0,0.25)';
+
+            markerContent.textContent = markerIcon;
+
+            markerElement.appendChild(markerContent);
 
            markerElement.onclick = () => {
+
+                window.selectedMarkerContent = markerContent;
+
                 document.getElementById('pointMessage').textContent =
                     point.title + '\n\n' +
                     point.text + '\n\n' +
