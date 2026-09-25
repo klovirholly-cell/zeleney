@@ -2318,7 +2318,8 @@ uniqueHistory.forEach(item => {
         const {
             YMap,
             YMapDefaultSchemeLayer,
-            YMapDefaultFeaturesLayer
+            YMapDefaultFeaturesLayer,
+            YMapMarker
         } = ymaps3;
 
         const mapContainer = document.getElementById('yandexMap');
@@ -2389,7 +2390,7 @@ uniqueHistory.forEach(item => {
                 document.getElementById('pointCard').style.display = 'block';
             };
 
-            const marker = new ymaps3.YMapMarker(
+            const marker = new YMapMarker(
                 {
                     coordinates: point.coordinates
                 },
@@ -2399,7 +2400,7 @@ uniqueHistory.forEach(item => {
             window.ecoMap.addChild(marker);
 
             });
-            
+
         console.log('Яндекс Карта загружена 🌿');
     }
 </script>
