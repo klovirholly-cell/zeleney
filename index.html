@@ -2089,16 +2089,36 @@ window.addEventListener('DOMContentLoaded', loadUser);
     function helpPoint() {
         const pointName = document.getElementById('pointCard').dataset.pointName;
 
-        window.helpingPoint = true;
+        let completedPoints =
+            JSON.parse(localStorage.getItem('completedPoints')) || [];
 
-        addPlant();
+        if (!completedPoints.includes(pointName)) {
+            completedPoints.push(pointName);
 
-        window.helpingPoint = false;
+            localStorage.setItem(
+                'completedPoints',
+                JSON.stringify(completedPoints)
+            );
 
-        addHistory('🌱', 'Помогла озеленению', pointName);
+            window.helpingPoint = true;
 
-        alert('Ты помогла озеленению этого места! 🌱💚');
+            addPlant();
 
+            window.helpingPoint = false;
+
+            addHistory(
+                '🌱',
+                'Помогла озеленению',
+                pointName
+            );
+
+            alert('Ты помогла озеленению этого места! 🌱💚');
+        } else {
+            alert('Ты уже помогла этому месту! ✅💚');
+        }
+        if (window.ecoMap) {
+            initYandexMap();
+        }
         closePointCard();
     }
     function handlePhoto() {
@@ -2376,6 +2396,12 @@ uniqueHistory.forEach(item => {
         points.forEach(point => {
 
             const markerElement = document.createElement('div');
+            const completedPoints =
+                JSON.parse(localStorage.getItem('completedPoints')) || [];
+
+            const isCompleted = completedPoints.includes(point.title);
+
+            const markerIcon = isCompleted ? '✅' : '🌱';
 
             markerElement.innerHTML = `
                 <div style="
@@ -2391,7 +2417,7 @@ uniqueHistory.forEach(item => {
                     cursor: pointer;
                     box-shadow: 0 3px 10px rgba(0,0,0,0.25);
                 ">
-                    🌱
+                    ${markerIcon}
                 </div>
             `;
 
