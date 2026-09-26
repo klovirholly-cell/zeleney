@@ -2277,7 +2277,12 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
-        if (!submissions || submissions.length === 0) return;
+        console.log('НАЙДЕННЫЕ ПОДТВЕРЖДЁННЫЕ ЗАДАНИЯ:', submissions);
+
+        if (!submissions || submissions.length === 0) {
+            console.log('Подтверждённых заданий не найдено');
+            return;
+        }
 
         let rewardPoints = Number(localStorage.getItem('rewardPoints') || 0);
         let history = JSON.parse(localStorage.getItem('history') || '[]');
