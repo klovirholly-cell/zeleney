@@ -1636,11 +1636,89 @@
                 <span>Чат поддержки</span>
                 <span class="menu-arrow">›</span>
             </div>
-
         </section>
 
+
         <!-- ЧАТ ПОДДЕРЖКИ -->
+         <section id="myPlants" class="screen">
+
+            <button
+                type="button"
+                onclick="showScreen('profile')"
+                style="
+                    border:none;
+                    background:none;
+                    color:#5d9b58;
+                    font-size:16px;
+                    padding:5px 0 15px;
+                    cursor:pointer;
+                "
+            >
+                ← Назад
+            </button>
+
+            <h1>🌱 Мои растения</h1>
+
+            <p class="subtitle">
+                Здесь будут отображаться растения, которые ты добавила.
+            </p>
+
+            <div
+                style="
+                    background:#f1f8ee;
+                    border-radius:20px;
+                    padding:25px 18px;
+                    text-align:center;
+                    margin-top:20px;
+                "
+            >
+                <div style="font-size:50px;">🌿</div>
+
+                <div id="myPlantsList"></div>
+            </div>
+
+        </section>
+        <section id="myPoints" class="screen">
+
+            <button
+                type="button"
+                onclick="showScreen('profile')"
+                style="
+                    border:none;
+                    background:none;
+                    color:#5d9b58;
+                    font-size:16px;
+                    padding:5px 0 15px;
+                    cursor:pointer;
+                "
+            >
+                ← Назад
+            </button>
+
+            <h1>📍 Мои точки</h1>
+
+            <p class="subtitle">
+                Места, которые ты нашла и где помогла озеленению.
+            </p>
+
+            <div id="myPointsList"></div>
+
+        </section>
 <section id="support" class="screen">
+    <button
+        type="button"
+        onclick="showScreen('profile')"
+        style="
+            border:none;
+            background:none;
+            color:#5d9b58;
+            font-size:16px;
+            padding:5px 0 15px;
+            cursor:pointer;
+        "
+    >
+        ← Назад
+    </button>
 
     <h1>💬 Поддержка</h1>
     <p class="subtitle">Мы постараемся помочь тебе 🌿</p>
@@ -1824,14 +1902,127 @@ window.addEventListener('DOMContentLoaded', loadUser);
         alert('Имя изменено! 🌱');
     }
     function showMyPoints() {
-        const points = localStorage.getItem('pointCount') || '0';
+        showScreen('myPoints');
 
-        alert('📍 Ты добавила точек: ' + points);
+        const list = document.getElementById('myPointsList');
+
+        if (!list) return;
+
+        const history = JSON.parse(localStorage.getItem('history')) || [];
+
+        const points = history.filter(item =>
+            item.title && (
+                item.title.includes('Нашла новую точку') ||
+                item.title.includes('Помогла озеленению')
+            )
+        );
+
+        if (points.length === 0) {
+            list.innerHTML = `
+                <div style="
+                    background:#f1f8ee;
+                    border-radius:20px;
+                    padding:25px 18px;
+                    text-align:center;
+                    margin-top:20px;
+                ">
+                    <div style="font-size:50px;">📍</div>
+
+                    <h3 style="margin:10px 0 8px;">
+                        Пока здесь пусто
+                    </h3>
+
+                    <p style="color:#777; margin:0;">
+                        Найди первую точку на карте — и она появится здесь.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        list.innerHTML = points.map(point => `
+            <div style="
+                background:#f1f8ee;
+                border-radius:20px;
+                padding:18px;
+                margin-top:12px;
+            ">
+                <div style="font-size:35px;">📍</div>
+
+                <h3 style="margin:8px 0;">
+                    ${point.title}
+                </h3>
+
+                <p style="margin:5px 0; color:#666;">
+                    ${point.place}
+                </p>
+
+                <small style="color:#999;">
+                    ${point.date} · ${point.time}
+                </small>
+            </div>
+        `).join('');
     }
     function showMyPlants() {
-        const plants = localStorage.getItem('plantCount') || '0';
+        showScreen('myPlants');
 
-        alert('🌳 Ты посадила растений: ' + plants);
+        const list = document.getElementById('myPlantsList');
+
+        if (!list) return;
+
+        const history = JSON.parse(localStorage.getItem('history')) || [];
+
+        const plants = history.filter(item =>
+            item.title && item.title.startsWith('Посадила:')
+        );
+
+        if (plants.length === 0) {
+            list.innerHTML = `
+                <div style="
+                    background:#f1f8ee;
+                    border-radius:20px;
+                    padding:25px 18px;
+                    text-align:center;
+                    margin-top:20px;
+                ">
+                    <div style="font-size:50px;">🌱</div>
+
+                    <h3 style="margin:10px 0 8px;">
+                        Пока здесь пусто
+                    </h3>
+
+                    <p style="color:#777; margin:0;">
+                        Посади первое растение — и оно появится здесь.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        list.innerHTML = plants.map(plant => `
+            <div style="
+                background:#f1f8ee;
+                border-radius:20px;
+                padding:18px;
+                margin-top:12px;
+            ">
+                <div style="font-size:35px;">🌳</div>
+
+                <h3 style="margin:8px 0;">
+                    ${plant.title.replace('Посадила: ', '')}
+                </h3>
+
+                <p style="margin:5px 0; color:#666;">
+                    ${plant.place}
+                </p>
+
+                <small style="color:#999;">
+                    ${plant.date} · ${plant.time}
+                </small>
+            </div>
+        `).join('');
     }
     function resetData() {
         const confirmReset = confirm(
@@ -2069,7 +2260,9 @@ window.addEventListener('DOMContentLoaded', loadUser);
         navButtons.forEach(button => {
             button.classList.remove('active');
         });
-
+        if (screenName === 'support') {
+            renderSupportMessages();
+        }
         if (screenName === 'history') {
 
         const historyList = document.getElementById('historyList');
@@ -2244,71 +2437,66 @@ window.addEventListener('DOMContentLoaded', loadUser);
             alert('Фото добавлено! 📷💚 ');
         }
     }
-    // ==================== ЧАТ ПОДДЕРЖКИ ====================
-
-    function sendSupportMessage() {
-        const input = document.getElementById('supportInput');
+    
+    function renderSupportMessages() {
         const chat = document.getElementById('supportChat');
 
-        if (!input || !chat) return;
+        if (!chat) return;
 
-        const message = input.value.trim();
-
-        if (!message) return;
-
-        // Добавляем сообщение пользователя
-        const userMessage = document.createElement('div');
-
-        userMessage.style.cssText = `
-            background: #DFF0DA;
-            padding: 12px 15px;
-            border-radius: 16px;
-            margin: 10px 0 10px auto;
-            max-width: 85%;
-            text-align: left;
-        `;
-
-        userMessage.textContent = message;
-        chat.appendChild(userMessage);
-
-        // Сохраняем сообщение
-        let supportMessages =
-            JSON.parse(localStorage.getItem('supportMessages')) || [];
-
-        supportMessages.push({
-            text: message,
-            date: new Date().toLocaleString('ru-RU')
-        });
-
-        localStorage.setItem(
-            'supportMessages',
-            JSON.stringify(supportMessages)
-        );
-
-        input.value = '';
-
-        // Ответ поддержки
-        setTimeout(() => {
-            const supportMessage = document.createElement('div');
-
-            supportMessage.style.cssText = `
-                background: #E8F5E9;
-                padding: 12px 15px;
-                border-radius: 16px;
-                margin: 10px auto 10px 0;
-                max-width: 85%;
-            `;
-
-            supportMessage.innerHTML = `
+        chat.innerHTML = `
+            <div style="
+                background:#E8F5E9;
+                padding:12px 15px;
+                border-radius:16px;
+                margin-bottom:10px;
+                max-width:85%;
+            ">
                 <b>🌿 Поддержка</b>
                 <p style="margin:5px 0 0;">
-                    Спасибо за сообщение! Мы получили его и постараемся помочь 💚
+                    Привет! 👋 Расскажи, какая проблема возникла, и мы постараемся помочь.
                 </p>
-            `;
+            </div>
+        `;
 
-            chat.appendChild(supportMessage);
-            chat.scrollTop = chat.scrollHeight;
-        }, 500);
+        const messages =
+            JSON.parse(localStorage.getItem('supportMessages')) || [];
+
+        messages.forEach(item => {
+
+            const message = document.createElement('div');
+
+            if (item.type === 'user') {
+
+                message.style.cssText = `
+                    background:#DFF0DA;
+                    padding:12px 15px;
+                    border-radius:16px;
+                    margin:10px 0 10px auto;
+                    max-width:85%;
+                `;
+
+                message.textContent = item.text;
+
+            } else {
+
+                message.style.cssText = `
+                    background:#E8F5E9;
+                    padding:12px 15px;
+                    border-radius:16px;
+                    margin:10px auto 10px 0;
+                    max-width:85%;
+                `;
+
+                message.innerHTML = `
+                    <b>🌿 Поддержка</b>
+                    <p style="margin:5px 0 0;">
+                        ${item.text}
+                    </p>
+                `;
+            }
+
+            chat.appendChild(message);
+        });
 
         chat.scrollTop = chat.scrollHeight;
     }
@@ -2340,6 +2528,51 @@ window.addEventListener('DOMContentLoaded', loadUser);
         });
 
         chat.scrollTop = chat.scrollHeight;
+    }
+    function sendSupportMessage() {
+        const input = document.getElementById('supportInput');
+
+        if (!input) return;
+
+        const text = input.value.trim();
+
+        if (!text) return;
+
+        let messages =
+            JSON.parse(localStorage.getItem('supportMessages')) || [];
+
+        messages.push({
+            type: 'user',
+            text: text
+        });
+
+        localStorage.setItem(
+            'supportMessages',
+            JSON.stringify(messages)
+        );
+
+        input.value = '';
+
+        renderSupportMessages();
+
+        setTimeout(function() {
+
+            let messages =
+                JSON.parse(localStorage.getItem('supportMessages')) || [];
+
+            messages.push({
+                type: 'support',
+                text: 'Спасибо за сообщение! 🌿 Мы получили его и постараемся помочь.'
+            });
+
+            localStorage.setItem(
+                'supportMessages',
+                JSON.stringify(messages)
+            );
+
+            renderSupportMessages();
+
+        }, 500);
     }
     function addHistory(icon, title, place) {
     
