@@ -1493,13 +1493,6 @@
                 ← Назад
             </button>
         </div>
-            <h2 id="historyDetailsTitle"></h2>
-            <p id="historyDetailsText"></p>
-
-            <button onclick="closeHistoryDetails()">
-                ← Назад
-            </button>
-        </div>
 
         <!-- ДОСТИЖЕНИЯ -->
 <section id="achievements" class="screen">
@@ -2005,13 +1998,28 @@ window.addEventListener('DOMContentLoaded', loadUser);
         });
 
         if (screenName === 'history') {
-            let historyList = document.getElementById('historyList');
-            let history = JSON.parse(localStorage.getItem('history')) || [];
 
-            historyList.innerHTML = '';
+        const historyList = document.getElementById('historyList');
+        const history = JSON.parse(localStorage.getItem('history')) || [];
+        const emptyHistory = document.getElementById('emptyHistory');
+
+        historyList.innerHTML = '';
+
+        if (history.length === 0) {
+
+            historyList.innerHTML = `
+                <div id="emptyHistory" style="text-align:center; padding:40px 20px; color:#777;">
+                    <div style="font-size:50px;">🌱</div>
+                    <h3>Пока здесь пусто</h3>
+                    <p>Начни помогать озеленению — твои действия появятся здесь 💚</p>
+                </div>
+            `;
+
+        } else {
 
             history.forEach(item => {
-                let element = document.createElement('div');
+
+                const element = document.createElement('div');
                 element.className = 'history-item';
 
                 element.setAttribute(
@@ -2025,7 +2033,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
                     <div>
                         <h4>${item.title}</h4>
                         <p>${item.place}</p>
-                        <small>${item.date || ''} ${item.time || ''}</small>
+                        <small>${item.date || ''} · ${item.time || ''}</small>
                     </div>
 
                     <div class="history-arrow">›</div>
@@ -2034,6 +2042,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
                 historyList.appendChild(element);
             });
         }
+    }
 
 
         // Выделяем текущую кнопку
@@ -2268,46 +2277,7 @@ function closeHistoryDetails() {
 
         photoHistory.prepend(photo);
     }
-    let savedHistory = JSON.parse(localStorage.getItem('history')) || [];
-
-let uniqueHistory = [];
-
-savedHistory.forEach(item => {
-    let exists = uniqueHistory.some(savedItem =>
-        savedItem.icon === item.icon &&
-        savedItem.title === item.title &&
-        savedItem.place
- === item.place
-    );
-
-    if (!exists) {
-        uniqueHistory.push(item);
-    }
-});
-
-localStorage.setItem('history', JSON.stringify(uniqueHistory));
-
-let historyList = document.getElementById('historyList');
-
-uniqueHistory.forEach(item => {
-    let historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
-
-    historyItem.setAttribute(
-        'onclick',
-        `showHistoryDetails('plant', '${item.title}', '${item.place}')`
-    );
-
-    historyItem.innerHTML = `
-        <div class="history-icon">${item.icon}</div>
-        <div>
-            <h4>${item.title}</h4>
-            <p>${item.place}</p>
-        </div>
-    `;
-
-    historyList.prepend(historyItem);
-});
+    
     function updateAchievements() {
         const plantCount = Number(localStorage.getItem('plantCount')) || 0;
 
