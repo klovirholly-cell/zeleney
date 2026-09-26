@@ -2258,7 +2258,11 @@ window.addEventListener('DOMContentLoaded', loadUser);
         );
     }
     async function checkApprovedTasks() {
+        console.log('ПРОВЕРКА ЗАДАНИЯ ЗАПУЩЕНА');
+
         const userId = localStorage.getItem('userName') || 'Гость';
+
+        console.log('Имя пользователя в приложении:', userId);
 
         if (userId === 'Гость') return;
 
