@@ -1819,22 +1819,22 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://oooorjusfbjvnvviprkg.supabase.co/rest/v1/';
-        const SUPABASE_ANON_KEY = 'sb_publishable_7BY9wwKnitGch6k6Kst5HQ_yaozMdLq';
+    const SUPABASE_URL = 'https://oooorjusfbjvnvviprkg.supabase.co/rest/v1/';
+    const SUPABASE_ANON_KEY = 'sb_publishable_7BY9wwKnitGch6k6Kst5HQ_yaozMdLq';
 
-        const supabase = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_ANON_KEY
-        );
+    const supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
 
-        (async () => {
-            const { data, error } = await supabase
-                .from('tasks')
-                .select('*')
-                .limit(1);
+    (async () => {
+        const { data, error } = await supabase
+            .from('tasks')
+            .select('*')
+            .limit(1);
 
-            console.log('Проверка Supabase:', data, error);
-        })();
+        console.log('Проверка Supabase:', data, error);
+    })();
     function registerUser() {
         const name = document.getElementById('nameInput').value.trim();
     
