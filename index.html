@@ -2184,7 +2184,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
             `;
         }
     }
-    function submitTaskProof() {
+    async function submitTaskProof() {
         const input = document.getElementById('taskPhotoInput');
 
         if (!input || input.files.length === 0) {
@@ -2192,33 +2192,63 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
-        // Проверяем, не было ли задание уже выполнено
-        if (localStorage.getItem('cityTaskStatus') === 'completed') {
-            alert('Это задание уже выполнено 🌿');
-            closeTaskProof();
+        // Проверяем, не отправлялось ли уже это задание
+        const userId = localStorage.getItem('userName') || 'Гость';
+
+        const { data: existingSubmission, error: checkError } = await supabaseClient
+            .from('task_submissions')
+            .select('id, status')
+            .eq('user_id', userId)
+            .eq('status', 'pending')
+            .limit(1);
+
+        if (checkError) {
+            console.error('Ошибка проверки:', checkError);
+            alert('Не удалось проверить заявку. Попробуй ещё раз.');
             return;
         }
 
-        // Получаем текущие баллы
-        let rewardPoints = Number(localStorage.getItem('rewardPoints')) || 0;
+        if (existingSubmission && existingSubmission.length > 0) {
+            alert('У тебя уже есть задание, ожидающее проверки 🌿');
+            return;
+        }
 
-        // Начисляем награду только один раз
-        rewardPoints += 100;
+        // Находим наше задание в Supabase
+        const { data: task, error: taskError } = await supabaseClient
+            .from('tasks')
+            .select('id, title, reward_points')
+            .eq('title', '🌳 Посади дерево')
+            .limit(1)
+            .single();
 
-        // Сохраняем баллы
-        localStorage.setItem('rewardPoints', rewardPoints);
+        if (taskError || !task) {
+            console.error('Ошибка поиска задания:', taskError);
+            alert('Не удалось найти задание в базе.');
+            return;
+        }
 
-        // Обновляем баллы на главной и в профиле
-        document.querySelectorAll('#rewardPoints').forEach(element => {
-            element.textContent = rewardPoints;
-        });
+        // Отправляем заявку на проверку
+        const { error: submissionError } = await supabaseClient
+            .from('task_submissions')
+            .insert({
+                task_id: task.id,
+                user_id: userId,
+                proof_text: `Фото-доказательство: ${input.files[0].name}`,
+                status: 'pending'
+            });
 
-        // Помечаем задание выполненным
-        localStorage.setItem('cityTaskStatus', 'completed');
+        if (submissionError) {
+            console.error('Ошибка отправки:', submissionError);
+            alert('Не удалось отправить задание на проверку.');
+            return;
+        }
 
         closeTaskProof();
 
-        alert('Задание выполнено! 🎉\nТы получила +100 🌿');
+        alert(
+            'Задание отправлено на проверку! 🌱\n\n' +
+            'Баллы будут начислены только после подтверждения.'
+        );
     }
             function openPlantModal() {
         document.getElementById('plantModal').style.display = 'flex';
