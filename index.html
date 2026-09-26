@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://api-maps.yandex.ru/v3/?apikey=70e90cbd-0e35-4021-a977-7f696111a153&lang=ru_RU"></script>
     <title>Зеленей</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
     .registration-screen {
@@ -1817,7 +1818,21 @@
 
     </div>
 
+    const SUPABASE_URL = 'https://oooorjusfbjvnvviprkg.supabase.co/rest/v1/';
+    const SUPABASE_ANON_KEY = 'sb_publishable_7BY9wwKnitGch6k6Kst5HQ_yaozMdLq';
 
+    const supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+    (async () => {
+        const { data, error } = await supabase
+            .from('tasks')
+            .select('*')
+            .limit(1);
+
+        console.log('Проверка Supabase:', data, error);
+    })();
     <script>
     function registerUser() {
         const name = document.getElementById('nameInput').value.trim();
