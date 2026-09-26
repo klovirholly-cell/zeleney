@@ -2192,14 +2192,14 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
-        // Проверяем, не отправлялось ли уже это задание
         const userId = localStorage.getItem('userName') || 'Гость';
 
+        // Проверяем, нет ли уже заявки на проверке
         const { data: existingSubmission, error: checkError } = await supabaseClient
             .from('task_submissions')
             .select('id, status')
             .eq('user_id', userId)
-            .eq('status', 'pending')
+            .in('status', ['pending', 'approved'])
             .limit(1);
 
         if (checkError) {
@@ -2209,11 +2209,18 @@ window.addEventListener('DOMContentLoaded', loadUser);
         }
 
         if (existingSubmission && existingSubmission.length > 0) {
-            alert('У тебя уже есть задание, ожидающее проверки 🌿');
+            const status = existingSubmission[0].status;
+
+            if (status === 'pending') {
+                alert('У тебя уже есть задание, ожидающее проверки 🌿');
+            } else if (status === 'approved') {
+                alert('Это задание уже подтверждено и баллы были начислены 🌱');
+            }
+
             return;
         }
 
-        // Находим наше задание в Supabase
+        // Получаем задание из Supabase
         const { data: tasks, error: taskError } = await supabaseClient
             .from('tasks')
             .select('id, title, reward_points')
@@ -2227,7 +2234,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
-        // Отправляем заявку на проверку
+        // Отправляем заявку
         const { error: submissionError } = await supabaseClient
             .from('task_submissions')
             .insert({
@@ -2247,10 +2254,97 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         alert(
             'Задание отправлено на проверку! 🌱\n\n' +
-            'Баллы будут начислены только после подтверждения.'
+            'Баллы будут начислены после подтверждения.'
         );
     }
-            function openPlantModal() {
+    async function checkApprovedTasks() {
+        const userId = localStorage.getItem('userName') || 'Гость';
+
+        if (userId === 'Гость') return;
+
+        const { data: submissions, error } = await supabaseClient
+            .from('task_submissions')
+            .select('id, task_id, status, admin_comment')
+            .eq('user_id', userId)
+            .eq('status', 'approved');
+
+        if (error) {
+            console.error('Ошибка проверки подтвержденных заданий:', error);
+            return;
+        }
+
+        if (!submissions || submissions.length === 0) return;
+
+        let rewardPoints = Number(localStorage.getItem('rewardPoints') || 0);
+        let history = JSON.parse(localStorage.getItem('history') || '[]');
+
+        let changed = false;
+
+        for (const submission of submissions) {
+
+            const alreadyRewarded = localStorage.getItem(
+                `rewarded_submission_${submission.id}`
+            );
+
+            if (alreadyRewarded) continue;
+
+            // Получаем размер награды
+            const { data: task, error: taskError } = await supabaseClient
+                .from('tasks')
+                .select('title, reward_points')
+                .eq('id', submission.task_id)
+                .limit(1)
+                .single();
+
+            if (taskError || !task) {
+                console.error('Не удалось получить награду:', taskError);
+                continue;
+            }
+
+            const reward = Number(task.reward_points || 0);
+
+            // Начисляем баллы
+            rewardPoints += reward;
+
+            // Добавляем запись в историю
+            history.push({
+                icon: '🌳',
+                title: task.title,
+                place: 'Задание города',
+                date: new Date().toLocaleDateString('ru-RU'),
+                time: new Date().toLocaleTimeString('ru-RU', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            });
+
+            // Запоминаем, что за эту заявку награда уже выдана
+            localStorage.setItem(
+                `rewarded_submission_${submission.id}`,
+                'true'
+            );
+
+            changed = true;
+        }
+
+        if (changed) {
+            localStorage.setItem('rewardPoints', rewardPoints);
+            localStorage.setItem('history', JSON.stringify(history));
+
+            localStorage.setItem('cityTaskStatus', 'completed');
+
+            alert(
+                '🎉 Задание подтверждено!\n\n' +
+                `Тебе начислено ${rewardPoints} 🌿`
+            );
+
+            // Обновляем экран
+            if (typeof updateProfileStats === 'function') {
+                updateProfileStats();
+            }
+        }
+    }
+     function openPlantModal() {
         document.getElementById('plantModal').style.display = 'flex';
     }
 
@@ -2791,6 +2885,9 @@ function closeHistoryDetails() {
             }
         });
     }
+    setTimeout(() => {
+        checkApprovedTasks();
+    }, 1000);
     </script>
     <script>
     async function initYandexMap() {
@@ -2910,8 +3007,7 @@ function closeHistoryDetails() {
 
         console.log('Яндекс Карта загружена 🌿');
     }
-</script>
-
     
+    </script>
     </body>
     </html>
