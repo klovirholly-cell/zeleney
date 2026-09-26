@@ -1631,7 +1631,80 @@
                 <span class="menu-arrow">›</span>
             </div>
 
+            <div class="profile-menu-item" onclick="showScreen('support')">
+                <span class="menu-icon">💬</span>
+                <span>Чат поддержки</span>
+                <span class="menu-arrow">›</span>
+            </div>
+
         </section>
+
+        <!-- ЧАТ ПОДДЕРЖКИ -->
+<section id="support" class="screen">
+
+    <h1>💬 Поддержка</h1>
+    <p class="subtitle">Мы постараемся помочь тебе 🌿</p>
+
+    <div id="supportChat" style="
+        background: white;
+        border-radius: 22px;
+        padding: 15px;
+        min-height: 350px;
+        max-height: 450px;
+        overflow-y: auto;
+        box-shadow: 0 4px 12px rgba(80,120,70,0.08);
+        margin-bottom: 15px;
+    ">
+
+        <div style="
+            background: #E8F5E9;
+            padding: 12px 15px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            max-width: 85%;
+        ">
+            <b>🌿 Поддержка</b>
+            <p style="margin-top:5px;">
+                Привет! 👋 Расскажи, какая проблема возникла, и мы постараемся помочь.
+            </p>
+        </div>
+
+    </div>
+
+    <div style="display:flex; gap:8px;">
+
+        <input
+            type="text"
+            id="supportInput"
+            placeholder="Напиши сообщение..."
+            style="
+                flex:1;
+                padding:14px;
+                border:1px solid #D5E2D0;
+                border-radius:15px;
+                font-size:14px;
+                outline:none;
+            "
+        >
+
+        <button
+            onclick="sendSupportMessage()"
+            style="
+                width:52px;
+                border:none;
+                border-radius:15px;
+                background:#5d9b58;
+                color:white;
+                font-size:20px;
+                cursor:pointer;
+            "
+        >
+            ➤
+        </button>
+
+    </div>
+
+</section>
 
 
         <!-- НИЖНЕЕ МЕНЮ -->
@@ -2171,7 +2244,103 @@ window.addEventListener('DOMContentLoaded', loadUser);
             alert('Фото добавлено! 📷💚 ');
         }
     }
+    // ==================== ЧАТ ПОДДЕРЖКИ ====================
 
+    function sendSupportMessage() {
+        const input = document.getElementById('supportInput');
+        const chat = document.getElementById('supportChat');
+
+        if (!input || !chat) return;
+
+        const message = input.value.trim();
+
+        if (!message) return;
+
+        // Добавляем сообщение пользователя
+        const userMessage = document.createElement('div');
+
+        userMessage.style.cssText = `
+            background: #DFF0DA;
+            padding: 12px 15px;
+            border-radius: 16px;
+            margin: 10px 0 10px auto;
+            max-width: 85%;
+            text-align: left;
+        `;
+
+        userMessage.textContent = message;
+        chat.appendChild(userMessage);
+
+        // Сохраняем сообщение
+        let supportMessages =
+            JSON.parse(localStorage.getItem('supportMessages')) || [];
+
+        supportMessages.push({
+            text: message,
+            date: new Date().toLocaleString('ru-RU')
+        });
+
+        localStorage.setItem(
+            'supportMessages',
+            JSON.stringify(supportMessages)
+        );
+
+        input.value = '';
+
+        // Ответ поддержки
+        setTimeout(() => {
+            const supportMessage = document.createElement('div');
+
+            supportMessage.style.cssText = `
+                background: #E8F5E9;
+                padding: 12px 15px;
+                border-radius: 16px;
+                margin: 10px auto 10px 0;
+                max-width: 85%;
+            `;
+
+            supportMessage.innerHTML = `
+                <b>🌿 Поддержка</b>
+                <p style="margin:5px 0 0;">
+                    Спасибо за сообщение! Мы получили его и постараемся помочь 💚
+                </p>
+            `;
+
+            chat.appendChild(supportMessage);
+            chat.scrollTop = chat.scrollHeight;
+        }, 500);
+
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+
+    // Загружаем сохранённые сообщения
+    function loadSupportMessages() {
+        const chat = document.getElementById('supportChat');
+
+        if (!chat) return;
+
+        const messages =
+            JSON.parse(localStorage.getItem('supportMessages')) || [];
+
+        messages.forEach(item => {
+            const message = document.createElement('div');
+
+            message.style.cssText = `
+                background: #DFF0DA;
+                padding: 12px 15px;
+                border-radius: 16px;
+                margin: 10px 0 10px auto;
+                max-width: 85%;
+                text-align: left;
+            `;
+
+            message.textContent = item.text;
+            chat.appendChild(message);
+        });
+
+        chat.scrollTop = chat.scrollHeight;
+    }
     function addHistory(icon, title, place) {
     
         let historyList = document.getElementById('historyList');
