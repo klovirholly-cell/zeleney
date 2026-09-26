@@ -1680,30 +1680,30 @@
         </section>
         <section id="myPoints" class="screen">
 
-            <button
-                type="button"
-                onclick="showScreen('profile')"
-                style="
-                    border:none;
-                    background:none;
-                    color:#5d9b58;
-                    font-size:16px;
-                    padding:5px 0 15px;
-                    cursor:pointer;
-                "
-            >
-                ← Назад
-            </button>
+        <button
+            type="button"
+            onclick="showScreen('profile')"
+            style="
+                border:none;
+                background:none;
+                color:#5d9b58;
+                font-size:16px;
+                padding:5px 0 15px;
+                cursor:pointer;
+            "
+        >
+            ← Назад
+        </button>
 
-            <h1>📍 Мои точки</h1>
+        <h1>📍 Мои точки</h1>
 
-            <p class="subtitle">
-                Места, которые ты нашла и где помогла озеленению.
-            </p>
+        <p class="subtitle">
+            Места, которые ты нашла и где помогла озеленению.
+        </p>
 
-            <div id="myPointsList"></div>
+        <div id="myPointsList"></div>
 
-        </section>
+    </section>
 <section id="support" class="screen">
     <button
         type="button"
@@ -1908,16 +1908,28 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         if (!list) return;
 
-        const history = JSON.parse(localStorage.getItem('history')) || [];
+        const completedPoints =
+            JSON.parse(localStorage.getItem('completedPoints')) || [];
 
-        const points = history.filter(item =>
-            item.title && (
-                item.title.includes('Нашла новую точку') ||
-                item.title.includes('Помогла озеленению')
-            )
-        );
+        const points = [
+            {
+                title: '🌳 Сквер — посадка деревьев',
+                text: 'Здесь можно помочь озеленению Судака.',
+                action: 'Посади дерево и добавь его в свой экологический прогресс.'
+            },
+            {
+                title: '🌱 Зона озеленения',
+                text: 'Место, где можно посадить растение и сделать город зеленее.',
+                action: 'Добавь растение в свой экологический прогресс.'
+            },
+            {
+                title: '💚 Экологическая акция',
+                text: 'Здесь проходят экологические мероприятия.',
+                action: 'Прими участие в экологической акции.'
+            }
+        ];
 
-        if (points.length === 0) {
+        if (completedPoints.length === 0) {
             list.innerHTML = `
                 <div style="
                     background:#f1f8ee;
@@ -1933,7 +1945,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
                     </h3>
 
                     <p style="color:#777; margin:0;">
-                        Найди первую точку на карте — и она появится здесь.
+                        Помоги первой точке на карте — и она появится здесь 🌱
                     </p>
                 </div>
             `;
@@ -1941,26 +1953,51 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
-        list.innerHTML = points.map(point => `
+        const myPoints = points.filter(point =>
+            completedPoints.includes(point.title)
+        );
+
+        list.innerHTML = myPoints.map(point => `
             <div style="
                 background:#f1f8ee;
                 border-radius:20px;
                 padding:18px;
                 margin-top:12px;
             ">
-                <div style="font-size:35px;">📍</div>
-
-                <h3 style="margin:8px 0;">
+                <h3 style="
+                    margin:0 0 10px;
+                    color:#315f3b;
+                ">
                     ${point.title}
                 </h3>
 
-                <p style="margin:5px 0; color:#666;">
-                    ${point.place}
+                <p style="
+                    margin:0 0 10px;
+                    color:#666;
+                    line-height:1.5;
+                ">
+                    ${point.text}
                 </p>
 
-                <small style="color:#999;">
-                    ${point.date} · ${point.time}
-                </small>
+                <div style="
+                    background:white;
+                    border-radius:14px;
+                    padding:12px;
+                    color:#5d8066;
+                    font-size:14px;
+                ">
+                    🌱 <b>Что можно сделать:</b><br>
+                    ${point.action}
+                </div>
+
+                <div style="
+                    margin-top:12px;
+                    color:#4CAF50;
+                    font-size:13px;
+                    font-weight:bold;
+                ">
+                    ✅ Ты уже помогла этому месту
+                </div>
             </div>
         `).join('');
     }
