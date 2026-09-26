@@ -1637,6 +1637,19 @@
                 <span>Чат поддержки</span>
                 <span class="menu-arrow">›</span>
             </div>
+            <button onclick="openAdminPanel()" style="
+            margin-top:20px;
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:16px;
+            background:#e8f5e9;
+            color:#2e7d32;
+            font-size:16px;
+            cursor:pointer;
+        ">
+            ⚙️ Панель администратора
+        </button>
         </section>
 
 
@@ -1785,7 +1798,41 @@
 
 </section>
 
+        <!-- АДМИН-ПАНЕЛЬ -->
+        <section id="adminScreen" class="screen">
 
+            <button
+                type="button"
+                onclick="closeAdminPanel()"
+                style="
+                    border:none;
+                    background:none;
+                    color:#5d9b58;
+                    font-size:16px;
+                    padding:5px 0 15px;
+                    cursor:pointer;
+                "
+            >
+                ← Назад
+            </button>
+
+            <h1>⚙️ Панель администратора</h1>
+
+            <p class="subtitle">
+                Проверка заданий пользователей 🌿
+            </p>
+
+            <div id="adminSubmissions">
+                <p style="
+                    text-align:center;
+                    color:#777;
+                    padding:30px 10px;
+                ">
+                    Загрузка заявок...
+                </p>
+            </div>
+
+        </section>
         <!-- НИЖНЕЕ МЕНЮ -->
 
         <nav class="nav">
@@ -2897,6 +2944,242 @@ function closeHistoryDetails() {
     setTimeout(() => {
         checkApprovedTasks();
     }, 1000);
+    function openAdminPanel() {
+        document.getElementById('adminScreen').style.display = 'block';
+
+        loadAdminSubmissions();
+    }
+
+    function closeAdminPanel() {
+        document.getElementById('adminScreen').style.display = 'none';
+    }
+
+    async function loadAdminSubmissions() {
+        const container = document.getElementById('adminSubmissions');
+
+        container.innerHTML = `
+            <p style="text-align:center;color:#777;padding:20px;">
+                Загрузка заявок...
+            </p>
+        `;
+
+        const { data, error } = await supabaseClient
+            .from('task_submissions')
+            .select(`
+                id,
+                user_id,
+                proof_text,
+                status,
+                created_at,
+                tasks (
+                    title,
+                    reward_points
+                )
+            `)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Ошибка загрузки заявок:', error);
+
+            container.innerHTML = `
+                <div style="
+                    background:#fff0f0;
+                    padding:18px;
+                    border-radius:18px;
+                    color:#c62828;
+                ">
+                    ❌ Не удалось загрузить заявки.
+                    <br><br>
+                    Проверь подключение к Supabase.
+                </div>
+            `;
+
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            container.innerHTML = `
+                <div style="
+                    background:white;
+                    padding:25px;
+                    border-radius:20px;
+                    text-align:center;
+                    color:#777;
+                    box-shadow:0 4px 12px rgba(80,120,70,0.08);
+                ">
+                    <div style="font-size:45px;">🌿</div>
+
+                    <h3 style="margin:10px 0;">
+                        Новых заявок пока нет
+                    </h3>
+
+                    <p>
+                        Когда пользователь отправит задание,
+                        оно появится здесь.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = data.map(submission => `
+            <div style="
+                background:white;
+                padding:20px;
+                border-radius:20px;
+                margin-bottom:15px;
+                box-shadow:0 3px 12px rgba(0,0,0,0.06);
+            ">
+
+                <h3 style="
+                    margin-top:0;
+                    color:#315f3b;
+                ">
+                    ${submission.tasks?.title || 'Задание'}
+                </h3>
+
+                <p>
+                    👤 Пользователь:
+                    <b>${submission.user_id}</b>
+                </p>
+
+                <p>
+                    🌿 Награда:
+                    <b>${submission.tasks?.reward_points || 0} баллов</b>
+                </p>
+
+                <p>
+                    📷 Фото:
+                    <b>${submission.proof_text || 'не указано'}</b>
+                </p>
+
+                <p style="
+                    color:#999;
+                    font-size:13px;
+                ">
+                    Заявка №${submission.id}
+                </p>
+
+                <div style="
+                    display:flex;
+                    gap:10px;
+                    margin-top:15px;
+                ">
+
+                    <button
+                        onclick="approveTask(${submission.id})"
+                        style="
+                            flex:1;
+                            padding:13px;
+                            border:none;
+                            border-radius:14px;
+                            background:#4CAF50;
+                            color:white;
+                            font-size:15px;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+                        ✅ Одобрить
+                    </button>
+
+                    <button
+                        onclick="rejectTask(${submission.id})"
+                        style="
+                            flex:1;
+                            padding:13px;
+                            border:none;
+                            border-radius:14px;
+                            background:#ffebee;
+                            color:#c62828;
+                            font-size:15px;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+                        ❌ Отклонить
+                    </button>
+
+                </div>
+
+            </div>
+        `).join('');
+    }
+
+
+    async function approveTask(submissionId) {
+
+        const confirmed = confirm(
+            'Одобрить это задание? 🌿\n\nПользователю будут начислены баллы.'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('task_submissions')
+            .update({
+                status: 'approved',
+                reviewed_at: new Date().toISOString()
+            })
+            .eq('id', submissionId);
+
+        if (error) {
+            console.error('Ошибка одобрения:', error);
+
+            alert(
+                'Не удалось одобрить задание.\nПопробуй ещё раз.'
+            );
+
+            return;
+        }
+
+        alert('Задание одобрено! ✅🌿');
+
+        loadAdminSubmissions();
+    }
+
+
+    async function rejectTask(submissionId) {
+
+        const confirmed = confirm(
+            'Отклонить это задание? ❌\n\nПользователь не получит баллы.'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const comment = prompt(
+            'Причина отклонения (можно оставить пустым):'
+        );
+
+        const { error } = await supabaseClient
+            .from('task_submissions')
+            .update({
+                status: 'rejected',
+                admin_comment: comment || 'Задание не подтверждено',
+                reviewed_at: new Date().toISOString()
+            })
+            .eq('id', submissionId);
+
+        if (error) {
+            console.error('Ошибка отклонения:', error);
+
+            alert(
+                'Не удалось отклонить задание.\nПопробуй ещё раз.'
+            );
+
+            return;
+        }
+
+        alert('Задание отклонено ❌');
+
+        loadAdminSubmissions();
+    }
     </script>
     <script>
     async function initYandexMap() {
