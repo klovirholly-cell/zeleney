@@ -1488,26 +1488,21 @@
                     <h4>Добавила фотографию</h4>
                     <p>Вчера · Парк</p>
                 </div>
-            </div>
+            <section id="history" class="screen">
 
-            <div class="history-item">
-                <div class="history-icon">🌱 </div>
-                <div>
-                    <h4>Нашла новую точку</h4>
-                    <p>12 сентября · Краснодар</p>
+                <h1>Моя история 📖</h1>
+                <p class="subtitle">Твои маленькие шаги</p>
+
+                <div id="historyList">
+                    <div id="photoHistory"></div>
+                    <div id="emptyHistory" style="text-align:center; padding:40px 20px; color:#777;">
+                        <div style="font-size:50px;">🌱</div>
+                        <h3>Пока здесь пусто</h3>
+                        <p>Начни помогать озеленению — твои действия появятся здесь 💚</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="history-item">
-                <div class="history-icon">💚 </div>
-                <div>
-                    <h4>Помогла озеленению</h4>
-                    <p>10 сентября · Двор</p>
-                </div>
-            </div>
-
-        </div>
-        </section>
+            </section>
 
         <div id="historyDetails" class="history-details" style="display: none;">
             <h2 id="historyDetailsTitle"></h2>
@@ -2181,6 +2176,11 @@ window.addEventListener('DOMContentLoaded', loadUser);
     }
 
     function addHistory(icon, title, place) {
+        const emptyHistory = document.getElementById('emptyHistory');
+
+        if (emptyHistory) {
+            emptyHistory.style.display = 'none';
+        }
         let historyList = document.getElementById('historyList');
 
         let item = document.createElement('div');
