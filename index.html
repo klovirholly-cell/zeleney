@@ -2945,13 +2945,12 @@ function closeHistoryDetails() {
         checkApprovedTasks();
     }, 1000);
     function openAdminPanel() {
-        document.getElementById('adminScreen').style.display = 'block';
-
+        showScreen('adminScreen');
         loadAdminSubmissions();
     }
 
     function closeAdminPanel() {
-        document.getElementById('adminScreen').style.display = 'none';
+        showScreen('profileScreen');
     }
 
     async function loadAdminSubmissions() {
