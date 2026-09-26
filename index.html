@@ -2932,7 +2932,10 @@ function closeHistoryDetails() {
     function openAdminPanel() {
         const userName = localStorage.getItem('userName');
 
-        if (!userName || userName.trim().toLowerCase() !== 'ира') {
+        if (
+            !userName ||
+            !['ира', 'алиса'].includes(userName.trim().toLowerCase())
+        ) {
             alert('Доступ запрещён 🔒');
             return;
         }
@@ -3296,7 +3299,10 @@ function closeHistoryDetails() {
 
         if (!adminButton) return;
 
-        if (userName && userName.trim().toLowerCase() === 'ира') {
+        if (
+            userName &&
+            ['ира', 'алиса'].includes(userName.trim().toLowerCase())
+        ) {
             adminButton.style.display = 'block';
         } else {
             adminButton.style.display = 'none';
