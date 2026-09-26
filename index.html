@@ -1822,13 +1822,13 @@
     const SUPABASE_URL = 'https://oooorjusfbjvnvviprkg.supabase.co/rest/v1/';
     const SUPABASE_ANON_KEY = 'sb_publishable_7BY9wwKnitGch6k6Kst5HQ_yaozMdLq';
 
-    const supabase = window.supabase.createClient(
+    const supabaseClient = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_ANON_KEY
     );
 
     (async () => {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('tasks')
             .select('*')
             .limit(1);
