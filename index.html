@@ -2214,12 +2214,12 @@ window.addEventListener('DOMContentLoaded', loadUser);
         }
 
         // Находим наше задание в Supabase
-        const { data: task, error: taskError } = await supabaseClient
+        const { data: tasks, error: taskError } = await supabaseClient
             .from('tasks')
             .select('id, title, reward_points')
-            .eq('title', '🌳 Посади дерево')
-            .limit(1)
-            .single();
+            .limit(1);
+
+        const task = tasks && tasks.length > 0 ? tasks[0] : null;
 
         if (taskError || !task) {
             console.error('Ошибка поиска задания:', taskError);
