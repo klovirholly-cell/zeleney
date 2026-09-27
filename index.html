@@ -1740,7 +1740,205 @@
             </div>
 
         </section>
+        <!-- МАГАЗИН ФИЗИЧЕСКИХ ПРИЗОВ -->
+        <section id="rewardsShop" class="screen">
 
+            <button type="button" onclick="showScreen('profile')" style="
+                border:none;
+                background:none;
+                font-size:18px;
+                color:#2e7d32;
+                cursor:pointer;
+                margin-bottom:15px;
+            ">
+                ← Назад
+            </button>
+
+            <h1>🎁 Эко-магазин</h1>
+
+            <p class="subtitle">
+                Обменивай 🌿 баллы на реальные экологические призы
+            </p>
+
+            <div style="
+                background:#e8f5e9;
+                padding:16px;
+                border-radius:18px;
+                text-align:center;
+                margin:20px 0;
+                font-size:18px;
+                font-weight:bold;
+                color:#2e7d32;
+            ">
+                🌿 Твои баллы:
+                <span id="shopRewardPoints">0</span>
+            </div>
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:15px;
+            ">
+
+                <!-- Набор семян -->
+                <div style="
+                    background:white;
+                    padding:18px;
+                    border-radius:20px;
+                    box-shadow:0 4px 12px rgba(80,120,70,0.10);
+                ">
+                    <div style="font-size:45px;text-align:center;">🌱</div>
+
+                    <h3 style="margin:10px 0 5px;">
+                        Набор семян
+                    </h3>
+
+                    <p style="color:#666;">
+                        Небольшой набор семян для выращивания растений.
+                    </p>
+
+                    <strong style="color:#2e7d32;">
+                        100 🌿
+                    </strong>
+
+                    <button onclick="exchangePrize(
+                        'Набор семян',
+                        100
+                    )" style="
+                        width:100%;
+                        margin-top:12px;
+                        padding:12px;
+                        border:none;
+                        border-radius:14px;
+                        background:#66bb6a;
+                        color:white;
+                        font-size:16px;
+                        cursor:pointer;
+                    ">
+                        Обменять 🌿
+                    </button>
+                </div>
+
+                <!-- Горшок -->
+                <div style="
+                    background:white;
+                    padding:18px;
+                    border-radius:20px;
+                    box-shadow:0 4px 12px rgba(80,120,70,0.10);
+                ">
+                    <div style="font-size:45px;text-align:center;">🪴</div>
+
+                    <h3 style="margin:10px 0 5px;">
+                        Горшок для растения
+                    </h3>
+
+                    <p style="color:#666;">
+                        Небольшой горшок для выращивания домашнего растения.
+                    </p>
+
+                    <strong style="color:#2e7d32;">
+                        250 🌿
+                    </strong>
+
+                    <button onclick="exchangePrize(
+                        'Горшок для растения',
+                        250
+                    )" style="
+                        width:100%;
+                        margin-top:12px;
+                        padding:12px;
+                        border:none;
+                        border-radius:14px;
+                        background:#66bb6a;
+                        color:white;
+                        font-size:16px;
+                        cursor:pointer;
+                    ">
+                        Обменять 🌿
+                    </button>
+                </div>
+
+                <!-- Эко-сумка -->
+                <div style="
+                    background:white;
+                    padding:18px;
+                    border-radius:20px;
+                    box-shadow:0 4px 12px rgba(80,120,70,0.10);
+                ">
+                    <div style="font-size:45px;text-align:center;">🎒</div>
+
+                    <h3 style="margin:10px 0 5px;">
+                        Эко-сумка
+                    </h3>
+
+                    <p style="color:#666;">
+                        Многоразовая сумка для повседневных покупок.
+                    </p>
+
+                    <strong style="color:#2e7d32;">
+                        500 🌿
+                    </strong>
+
+                    <button onclick="exchangePrize(
+                        'Эко-сумка',
+                        500
+                    )" style="
+                        width:100%;
+                        margin-top:12px;
+                        padding:12px;
+                        border:none;
+                        border-radius:14px;
+                        background:#66bb6a;
+                        color:white;
+                        font-size:16px;
+                        cursor:pointer;
+                    ">
+                        Обменять 🌿
+                    </button>
+                </div>
+
+                <!-- Саженец -->
+                <div style="
+                    background:white;
+                    padding:18px;
+                    border-radius:20px;
+                    box-shadow:0 4px 12px rgba(80,120,70,0.10);
+                ">
+                    <div style="font-size:45px;text-align:center;">🌳</div>
+
+                    <h3 style="margin:10px 0 5px;">
+                        Саженец дерева
+                    </h3>
+
+                    <p style="color:#666;">
+                        Саженец для посадки и озеленения городской среды.
+                    </p>
+
+                    <strong style="color:#2e7d32;">
+                        1000 🌿
+                    </strong>
+
+                    <button onclick="exchangePrize(
+                        'Саженец дерева',
+                        1000
+                    )" style="
+                        width:100%;
+                        margin-top:12px;
+                        padding:12px;
+                        border:none;
+                        border-radius:14px;
+                        background:#66bb6a;
+                        color:white;
+                        font-size:16px;
+                        cursor:pointer;
+                    ">
+                        Обменять 🌿
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
         <!-- ЧАТ ПОДДЕРЖКИ -->
          <section id="myPlants" class="screen">
 
@@ -1919,7 +2117,24 @@
                     Загрузка заявок...
                 </p>
             </div>
+            <div id="adminRewardOrders" style="margin-top:25px;">
 
+                <h2 style="
+                    color:#315f3b;
+                    margin-bottom:15px;
+                ">
+                    🎁 Заявки на физические призы
+                </h2>
+
+                <p style="
+                    text-align:center;
+                    color:#777;
+                    padding:20px;
+                ">
+                    Загрузка заявок...
+                </p>
+
+            </div>
         </section>
         <!-- НИЖНЕЕ МЕНЮ -->
 
@@ -2022,7 +2237,80 @@
     }
 
 window.addEventListener('DOMContentLoaded', loadUser);
+    async function exchangePrize(prizeName, price) {
+        const userName = localStorage.getItem('userName');
 
+        if (!userName) {
+            alert('Сначала зарегистрируйся 🌱');
+            return;
+        }
+
+        const currentPoints = Number(
+            localStorage.getItem('rewardPoints') || 0
+        );
+
+        if (currentPoints < price) {
+            alert(
+                'Недостаточно 🌿 баллов.\n\n' +
+                'Нужно: ' + price + ' 🌿\n' +
+                'У тебя: ' + currentPoints + ' 🌿'
+            );
+            return;
+        }
+
+        const confirmed = confirm(
+            'Обменять ' + price + ' 🌿 на:\n\n' +
+            prizeName + '?\n\n' +
+            'После подтверждения баллы будут списаны.'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        // Создаём заявку на получение приза
+        const { error } = await supabaseClient
+            .from('reward_orders')
+            .insert({
+                user_id: userName,
+                prize_name: prizeName,
+                price: price,
+                status: 'pending'
+            });
+
+        if (error) {
+            console.error('Ошибка создания заявки:', error);
+
+            alert(
+                'Не удалось оформить заявку 😔\n\n' +
+                'Попробуй ещё раз.'
+            );
+
+            return;
+        }
+
+        // Списываем баллы только после успешного создания заявки
+        const newPoints = currentPoints - price;
+
+        localStorage.setItem(
+            'rewardPoints',
+            newPoints
+        );
+
+        document.querySelectorAll('#rewardPoints').forEach(element => {
+            element.textContent = newPoints;
+        });
+
+        document.getElementById('shopRewardPoints').textContent = newPoints;
+
+        alert(
+            '🎉 Заявка оформлена!\n\n' +
+            prizeName + '\n\n' +
+            'Списано: ' + price + ' 🌿\n' +
+            'Осталось: ' + newPoints + ' 🌿\n\n' +
+            'Заявка отправлена администратору.'
+        );
+    }
     function openRewardsShop() {
         const points = Number(localStorage.getItem('rewardPoints') || 0);
 
@@ -3094,7 +3382,185 @@ function closeHistoryDetails() {
     function closeAdminPanel() {
         showScreen('profile');
     }
+    async function loadRewardOrders() {
+        const container = document.getElementById('adminRewardOrders');
 
+        if (!container) return;
+
+        container.innerHTML = `
+            <h2 style="
+                color:#315f3b;
+                margin-bottom:15px;
+            ">
+                🎁 Заявки на физические призы
+            </h2>
+
+            <p style="
+                text-align:center;
+                color:#777;
+                padding:20px;
+            ">
+                Загрузка заявок...
+            </p>
+        `;
+
+        const { data, error } = await supabaseClient
+            .from('reward_orders')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Ошибка загрузки заявок на призы:', error);
+
+            container.innerHTML = `
+                <h2 style="color:#315f3b;">
+                    🎁 Заявки на физические призы
+                </h2>
+
+                <div style="
+                    background:#fff0f0;
+                    padding:18px;
+                    border-radius:18px;
+                    color:#c62828;
+                ">
+                    ❌ Не удалось загрузить заявки на призы.
+                </div>
+            `;
+
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            container.innerHTML = `
+                <h2 style="color:#315f3b;">
+                    🎁 Заявки на физические призы
+                </h2>
+
+                <div style="
+                    background:white;
+                    padding:25px;
+                    border-radius:20px;
+                    text-align:center;
+                    color:#777;
+                    box-shadow:0 4px 12px rgba(80,120,70,0.08);
+                ">
+                    <div style="font-size:45px;">🎁</div>
+
+                    <h3>
+                        Заявок на призы пока нет
+                    </h3>
+
+                    <p>
+                        Когда пользователь обменяет баллы,
+                        заявка появится здесь.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = `
+            <h2 style="
+                color:#315f3b;
+                margin-bottom:15px;
+            ">
+                🎁 Заявки на физические призы
+            </h2>
+
+            ${data.map(order => `
+                <div style="
+                    background:white;
+                    padding:20px;
+                    border-radius:20px;
+                    margin-bottom:15px;
+                    box-shadow:0 3px 12px rgba(0,0,0,0.06);
+                ">
+
+                    <h3 style="
+                        margin-top:0;
+                        color:#315f3b;
+                    ">
+                        🎁 ${order.prize_name}
+                    </h3>
+
+                    <p>
+                        👤 Пользователь:
+                        <b>${order.user_id}</b>
+                    </p>
+
+                    <p>
+                        🌿 Стоимость:
+                        <b>${order.price} баллов</b>
+                    </p>
+
+                    <p style="
+                        color:#999;
+                        font-size:13px;
+                    ">
+                        Заявка №${order.id}
+                    </p>
+
+                    <button
+                        onclick="approveRewardOrder(${order.id})"
+                        style="
+                            width:100%;
+                            padding:13px;
+                            border:none;
+                            border-radius:14px;
+                            background:#4CAF50;
+                            color:white;
+                            font-size:15px;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+                        ✅ Выдать приз
+                    </button>
+
+                </div>
+            `).join('')}
+        `;
+    }
+
+
+    async function approveRewardOrder(orderId) {
+
+        const confirmed = confirm(
+            'Подтвердить выдачу этого физического приза? 🎁'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('reward_orders')
+            .update({
+                status: 'completed',
+                reviewed_at: new Date().toISOString()
+            })
+            .eq('id', orderId);
+
+        if (error) {
+            console.error(
+                'Ошибка подтверждения выдачи приза:',
+                error
+            );
+
+            alert(
+                'Не удалось подтвердить выдачу приза.\n' +
+                'Попробуй ещё раз.'
+            );
+
+            return;
+        }
+
+        alert('Приз отмечен как выдан! 🎁✅');
+
+        loadRewardOrders();
+    }
     async function loadAdminSubmissions() {
         const container = document.getElementById('adminSubmissions');
 
