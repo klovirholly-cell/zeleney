@@ -1638,6 +1638,26 @@
                 <span class="menu-arrow">›</span>
             </div>
 
+            <div class="profile-menu-item" onclick="openNotifications()">
+                <span class="menu-icon">🔔</span>
+                <span>Уведомления</span>
+                <span id="notificationBadge" style="
+                    margin-left:auto;
+                    background:#ef5350;
+                    color:white;
+                    min-width:22px;
+                    height:22px;
+                    padding:0 6px;
+                    border-radius:50%;
+                    display:none;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:12px;
+                    font-weight:bold;
+                ">0</span>
+                <span class="menu-arrow">›</span>
+            </div>
+
             <div class="profile-menu-item" onclick="openSettings()">
                 <span class="menu-icon">⚙️</span>
                 <span>Настройки</span>
@@ -1664,6 +1684,41 @@
         </button>
         </section>
 
+        <!-- УВЕДОМЛЕНИЯ -->
+        <section id="notificationsScreen" class="screen">
+
+            <button
+                type="button"
+                onclick="showScreen('profile')"
+                style="
+                    border:none;
+                    background:none;
+                    font-size:18px;
+                    color:#2e7d32;
+                    cursor:pointer;
+                    margin-bottom:15px;
+                "
+            >
+                ← Назад
+            </button>
+
+            <h1>🔔 Уведомления</h1>
+
+            <p class="subtitle">
+                Здесь будут важные сообщения о твоих заданиях и подарках 🌿
+            </p>
+
+            <div id="notificationsList">
+                <p style="
+                    text-align:center;
+                    color:#777;
+                    padding:30px 10px;
+                ">
+                    Загрузка уведомлений...
+                </p>
+            </div>
+
+        </section>
         
         <!-- МАГАЗИН ФИЗИЧЕСКИХ ПРИЗОВ -->
         <section id="rewardsShop" class="screen">
@@ -2848,6 +2903,259 @@ window.addEventListener('DOMContentLoaded', loadUser);
         }
 
         alert('Растение добавлено! 🌱💚');
+    }
+    async function openNotifications() {
+
+        showScreen('notificationsScreen');
+
+        await loadNotifications();
+    }
+
+
+    async function loadNotifications() {
+
+        const container =
+            document.getElementById('notificationsList');
+
+        if (!container) return;
+
+        const userName =
+            localStorage.getItem('userName');
+
+        if (!userName) {
+
+            container.innerHTML = `
+                <div style="
+                    background:white;
+                    padding:25px;
+                    border-radius:20px;
+                    text-align:center;
+                ">
+                    🌱 Сначала зарегистрируйся.
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = `
+            <p style="
+                text-align:center;
+                color:#777;
+                padding:20px;
+            ">
+                Загрузка...
+            </p>
+        `;
+
+        const { data, error } = await supabaseClient
+            .from('notifications')
+            .select('*')
+            .eq('user_id', userName)
+            .order('created_at', {
+                ascending: false
+            });
+
+        if (error) {
+
+            console.error(
+                'Ошибка загрузки уведомлений:',
+                error
+            );
+
+            container.innerHTML = `
+                <div style="
+                    background:#fff0f0;
+                    padding:18px;
+                    border-radius:18px;
+                    color:#c62828;
+                ">
+                    ❌ Не удалось загрузить уведомления.
+                </div>
+            `;
+
+            return;
+        }
+
+        // Количество непрочитанных
+        const unreadCount = (data || []).filter(
+            notification => !notification.is_read
+        ).length;
+
+        const badge =
+            document.getElementById('notificationBadge');
+
+        if (badge) {
+
+            if (unreadCount > 0) {
+
+                badge.textContent = unreadCount;
+                badge.style.display = 'flex';
+
+            } else {
+
+                badge.style.display = 'none';
+            }
+        }
+
+        if (!data || data.length === 0) {
+
+            container.innerHTML = `
+                <div style="
+                    background:white;
+                    padding:30px 20px;
+                    border-radius:20px;
+                    text-align:center;
+                    box-shadow:0 3px 12px rgba(0,0,0,0.06);
+                ">
+
+                    <div style="
+                        font-size:50px;
+                        margin-bottom:10px;
+                    ">
+                        🔔
+                    </div>
+
+                    <h3>
+                        Уведомлений пока нет
+                    </h3>
+
+                    <p style="color:#777;">
+                        Здесь появятся сообщения
+                        о твоих заданиях и подарках.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = data.map(notification => `
+
+            <div style="
+                background:${notification.is_read
+                    ? 'white'
+                    : '#f1f8e9'};
+                padding:18px;
+                border-radius:20px;
+                margin-bottom:15px;
+                box-shadow:0 3px 12px rgba(0,0,0,0.06);
+                border-left:4px solid #66bb6a;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:flex-start;
+                    gap:10px;
+                ">
+
+                    <div style="flex:1;">
+
+                        <h3 style="
+                            margin:0 0 8px;
+                            color:#315f3b;
+                        ">
+                            ${notification.title}
+                        </h3>
+
+                        <p style="
+                            white-space:pre-line;
+                            line-height:1.5;
+                            margin:0;
+                        ">
+                            ${notification.message}
+                        </p>
+
+                    </div>
+
+                    <button
+                        onclick="deleteNotification(${notification.id})"
+                        title="Удалить уведомление"
+                        style="
+                            border:none;
+                            background:#ffebee;
+                            color:#c62828;
+                            width:36px;
+                            height:36px;
+                            border-radius:50%;
+                            cursor:pointer;
+                            font-size:16px;
+                            flex-shrink:0;
+                        "
+                    >
+                        🗑️
+                    </button>
+
+                </div>
+
+                <div style="
+                    margin-top:12px;
+                    color:#999;
+                    font-size:12px;
+                ">
+                    ${new Date(
+                        notification.created_at
+                    ).toLocaleString('ru-RU')}
+                </div>
+
+            </div>
+
+        `).join('');
+
+        // Отмечаем уведомления прочитанными
+        const unreadIds = (data || [])
+            .filter(notification => !notification.is_read)
+            .map(notification => notification.id);
+
+        if (unreadIds.length > 0) {
+
+            await supabaseClient
+                .from('notifications')
+                .update({
+                    is_read: true
+                })
+                .in('id', unreadIds);
+
+            if (badge) {
+                badge.style.display = 'none';
+            }
+        }
+    }
+
+
+    async function deleteNotification(notificationId) {
+
+        const confirmed = confirm(
+            'Удалить это уведомление? 🗑️'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('notifications')
+            .delete()
+            .eq('id', notificationId);
+
+        if (error) {
+
+            console.error(
+                'Ошибка удаления уведомления:',
+                error
+            );
+
+            alert(
+                'Не удалось удалить уведомление.\n' +
+                'Попробуй ещё раз.'
+            );
+
+            return;
+        }
+
+        await loadNotifications();
     }
     function showScreen(screenName) {
 
