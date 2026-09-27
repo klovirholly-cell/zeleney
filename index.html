@@ -1632,6 +1632,12 @@
                 <span class="menu-arrow">›</span>
             </div>
 
+            <div class="profile-menu-item" onclick="openRewardsShop()">
+                <span class="menu-icon">🎁</span>
+                <span>Магазин наград</span>
+                <span class="menu-arrow">›</span>
+            </div>
+
             <div class="profile-menu-item" onclick="openSettings()">
                 <span class="menu-icon">⚙️</span>
                 <span>Настройки</span>
@@ -1658,6 +1664,82 @@
         </button>
         </section>
 
+        <!-- МАГАЗИН НАГРАД -->
+        <section id="rewardsShop" class="screen">
+
+            <button type="button" onclick="showScreen('profile')" style="
+                border:none;
+                background:none;
+                font-size:18px;
+                color:#2e7d32;
+                cursor:pointer;
+                margin-bottom:15px;
+            ">
+                ← Назад
+            </button>
+
+            <h1>🎁 Магазин наград</h1>
+
+            <p class="subtitle">
+                Обменивай свои 🌿 баллы на экологические награды
+            </p>
+
+            <div style="
+                background:#e8f5e9;
+                padding:16px;
+                border-radius:18px;
+                text-align:center;
+                margin:20px 0;
+                font-size:18px;
+                font-weight:bold;
+                color:#2e7d32;
+            ">
+                🌿 У тебя:
+                <span id="shopRewardPoints">0</span>
+                баллов
+            </div>
+
+            <div class="profile-menu">
+
+                <div class="profile-menu-item" onclick="buyReward('plant', 50, '🌱 Новое растение')">
+                    <span class="menu-icon">🌱</span>
+                    <span>
+                        <strong>Новое растение</strong><br>
+                        <small>Стоимость: 50 🌿</small>
+                    </span>
+                    <span class="menu-arrow">›</span>
+                </div>
+
+                <div class="profile-menu-item" onclick="buyReward('rarePlant', 100, '🌳 Редкое растение')">
+                    <span class="menu-icon">🌳</span>
+                    <span>
+                        <strong>Редкое растение</strong><br>
+                        <small>Стоимость: 100 🌿</small>
+                    </span>
+                    <span class="menu-arrow">›</span>
+                </div>
+
+                <div class="profile-menu-item" onclick="buyReward('achievement', 250, '🏆 Особое достижение')">
+                    <span class="menu-icon">🏆</span>
+                    <span>
+                        <strong>Особое достижение</strong><br>
+                        <small>Стоимость: 250 🌿</small>
+                    </span>
+                    <span class="menu-arrow">›</span>
+                </div>
+
+                <div class="profile-menu-item" onclick="buyReward('ecoHero', 500, '🌍 Эко-герой')">
+                    <span class="menu-icon">🌍</span>
+                    <span>
+                        <strong>Эко-герой</strong><br>
+                        <small>Стоимость: 500 🌿</small>
+                    </span>
+                    <span class="menu-arrow">›</span>
+                </div>
+
+            </div>
+
+        </section>
 
         <!-- ЧАТ ПОДДЕРЖКИ -->
          <section id="myPlants" class="screen">
@@ -1940,6 +2022,58 @@
     }
 
 window.addEventListener('DOMContentLoaded', loadUser);
+
+    function openRewardsShop() {
+        const points = Number(localStorage.getItem('rewardPoints') || 0);
+
+        document.getElementById('shopRewardPoints').textContent = points;
+
+        showScreen('rewardsShop');
+    }
+
+    function buyReward(rewardId, price, rewardName) {
+        let points = Number(localStorage.getItem('rewardPoints') || 0);
+
+        if (points < price) {
+            alert(
+                'Недостаточно 🌿 баллов.\n\n' +
+                'Нужно: ' + price + ' 🌿\n' +
+                'У тебя: ' + points + ' 🌿'
+            );
+            return;
+        }
+
+        const confirmed = confirm(
+            'Получить награду?\n\n' +
+            rewardName + '\n' +
+            'Стоимость: ' + price + ' 🌿'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        points -= price;
+
+        localStorage.setItem('rewardPoints', points);
+        localStorage.setItem(
+            'reward_' + rewardId,
+            'true'
+        );
+
+        document.querySelectorAll('#rewardPoints').forEach(element => {
+            element.textContent = points;
+        });
+
+        document.getElementById('shopRewardPoints').textContent = points;
+
+        alert(
+            '🎉 Награда получена!\n\n' +
+            rewardName + '\n' +
+            'Осталось: ' + points + ' 🌿'
+        );
+    }
+
     function openSettings() {
         document.getElementById('settingsScreen').style.display = 'block';
     }
