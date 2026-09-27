@@ -2097,6 +2097,62 @@
                     Загрузка заявок...
                 </p>
             </div>
+            <div style="
+    background:#f1f8e9;
+    padding:18px;
+    border-radius:20px;
+    margin-bottom:25px;
+">
+
+    <h2 style="
+        color:#315f3b;
+        margin-top:0;
+    ">
+        🔐 Выдача подарка
+    </h2>
+
+    <p style="
+        color:#666;
+        margin-bottom:12px;
+    ">
+        Введи код, который показал пользователь.
+    </p>
+
+    <input
+        id="pickupCodeInput"
+        type="text"
+        placeholder="Например: ECO-K7P2QX"
+        style="
+            width:100%;
+            box-sizing:border-box;
+            padding:13px;
+            border:1px solid #c8e6c9;
+            border-radius:14px;
+            font-size:16px;
+            margin-bottom:10px;
+        "
+    >
+
+    <button
+        onclick="findRewardByCode()"
+        style="
+            width:100%;
+            padding:13px;
+            border:none;
+            border-radius:14px;
+            background:#4CAF50;
+            color:white;
+            font-size:15px;
+            font-weight:bold;
+            cursor:pointer;
+        "
+    >
+        🔎 Найти заявку
+    </button>
+
+    <div id="pickupCodeResult"></div>
+
+</div>
             <div id="adminRewardOrders" style="margin-top:25px;">
 
                 <h2 style="
@@ -2670,14 +2726,31 @@ window.addEventListener('DOMContentLoaded', loadUser);
         }
 
         const userId = localStorage.getItem('userName') || 'Гость';
+        const file = input.files[0];
 
-        // Проверяем, нет ли уже заявки на проверке
-        const { data: existingSubmission, error: checkError } = await supabaseClient
-            .from('task_submissions')
-            .select('id, status')
-            .eq('user_id', userId)
-            .in('status', ['pending', 'approved'])
-            .limit(1);
+        // Проверяем размер
+        if (file.size > 10 * 1024 * 1024) {
+            alert(
+                'Фотография слишком большая 📷\n\n' +
+                'Выбери изображение размером до 10 МБ.'
+            );
+            return;
+        }
+
+        // Проверяем тип файла
+        if (!file.type.startsWith('image/')) {
+            alert('Можно загрузить только фотографию 📷');
+            return;
+        }
+
+        // Проверяем, нет ли уже заявки
+        const { data: existingSubmission, error: checkError } =
+            await supabaseClient
+                .from('task_submissions')
+                .select('id, status')
+                .eq('user_id', userId)
+                .in('status', ['pending', 'approved'])
+                .limit(1);
 
         if (checkError) {
             console.error('Ошибка проверки:', checkError);
@@ -2697,11 +2770,12 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
-        // Получаем задание из Supabase
-        const { data: tasks, error: taskError } = await supabaseClient
-            .from('tasks')
-            .select('id, title, reward_points')
-            .limit(1);
+        // Получаем задание
+        const { data: tasks, error: taskError } =
+            await supabaseClient
+                .from('tasks')
+                .select('id, title, reward_points')
+                .limit(1);
 
         const task = tasks && tasks.length > 0 ? tasks[0] : null;
 
@@ -2711,19 +2785,40 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
-        // Отправляем заявку
-        const { error: submissionError } = await supabaseClient
-            .from('task_submissions')
-            .insert({
-                task_id: task.id,
-                user_id: userId,
-                proof_text: `Фото-доказательство: ${input.files[0].name}`,
-                status: 'pending'
-            });
+        // Превращаем фотографию в изображение для сохранения
+        const imageData = await new Promise((resolve, reject) => {
+
+            const reader = new FileReader();
+
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+
+            reader.readAsDataURL(file);
+        });
+
+        // Отправляем заявку вместе с фотографией
+        const { error: submissionError } =
+            await supabaseClient
+                .from('task_submissions')
+                .insert({
+                    task_id: task.id,
+                    user_id: userId,
+                    proof_text: `Фото-доказательство: ${file.name}`,
+                    proof_image_url: imageData,
+                    status: 'pending'
+                });
 
         if (submissionError) {
-            console.error('Ошибка отправки:', submissionError);
-            alert('Не удалось отправить задание на проверку.');
+            console.error(
+                'Ошибка отправки:',
+                submissionError
+            );
+
+            alert(
+                'Не удалось отправить задание на проверку.\n\n' +
+                submissionError.message
+            );
+
             return;
         }
 
@@ -2731,6 +2826,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         alert(
             'Задание отправлено на проверку! 🌱\n\n' +
+            'Фото прикреплено к заявке 📷\n' +
             'Баллы будут начислены после подтверждения.'
         );
     }
@@ -3353,7 +3449,223 @@ window.addEventListener('DOMContentLoaded', loadUser);
             alert('Фото добавлено! 📷💚 ');
         }
     }
-    
+    async function findRewardByCode() {
+
+        const input = document.getElementById('pickupCodeInput');
+        const result = document.getElementById('pickupCodeResult');
+
+        if (!input || !result) return;
+
+        const code = input.value.trim().toUpperCase();
+
+        if (!code) {
+            alert('Введи код получения 🔐');
+            return;
+        }
+
+        result.innerHTML = `
+            <p style="
+                text-align:center;
+                color:#777;
+                padding:15px;
+            ">
+                Поиск заявки...
+            </p>
+        `;
+
+        const { data: order, error } = await supabaseClient
+            .from('reward_orders')
+            .select('*')
+            .eq('pickup_code', code)
+            .eq('status', 'approved')
+            .maybeSingle();
+
+        if (error) {
+
+            console.error(
+                'Ошибка поиска заявки:',
+                error
+            );
+
+            result.innerHTML = `
+                <div style="
+                    margin-top:15px;
+                    background:#fff0f0;
+                    padding:15px;
+                    border-radius:15px;
+                    color:#c62828;
+                ">
+                    ❌ Ошибка поиска заявки.
+                </div>
+            `;
+
+            return;
+        }
+
+        if (!order) {
+
+            result.innerHTML = `
+                <div style="
+                    margin-top:15px;
+                    background:#fff0f0;
+                    padding:15px;
+                    border-radius:15px;
+                    color:#c62828;
+                ">
+                    ❌ Заявка с таким кодом не найдена
+                    или подарок уже выдан.
+                </div>
+            `;
+
+            return;
+        }
+
+        result.innerHTML = `
+            <div style="
+                background:white;
+                padding:18px;
+                border-radius:18px;
+                margin-top:15px;
+                box-shadow:0 3px 10px rgba(0,0,0,0.05);
+            ">
+
+                <h3 style="
+                    color:#315f3b;
+                    margin-top:0;
+                ">
+                    🎁 ${order.prize_name}
+                </h3>
+
+                <p>
+                    👤 Пользователь:
+                    <b>${order.user_id}</b>
+                </p>
+
+                <p>
+                    🌿 Стоимость:
+                    <b>${order.price} баллов</b>
+                </p>
+
+                <p>
+                    🔐 Код:
+                    <b>${order.pickup_code}</b>
+                </p>
+
+                <p style="
+                    color:#2e7d32;
+                    font-weight:bold;
+                ">
+                    🟢 Подарок готов к выдаче
+                </p>
+
+                <button
+                    onclick="completeRewardByCode(${order.id})"
+                    style="
+                        width:100%;
+                        padding:13px;
+                        border:none;
+                        border-radius:14px;
+                        background:#66bb6a;
+                        color:white;
+                        font-size:15px;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    📦 Подтвердить выдачу
+                </button>
+
+            </div>
+        `;
+    }
+    async function completeRewardByCode(orderId) {
+
+        const confirmed = confirm(
+            'Подтвердить, что подарок действительно выдан пользователю? 🎁\n\n' +
+            'После подтверждения заявка будет завершена.'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { data: order, error: orderError } = await supabaseClient
+            .from('reward_orders')
+            .select('*')
+            .eq('id', orderId)
+            .eq('status', 'approved')
+            .single();
+
+        if (orderError || !order) {
+
+            alert(
+                'Заявка не найдена или уже завершена.'
+            );
+
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('reward_orders')
+            .update({
+                status: 'completed',
+                reviewed_at: new Date().toISOString()
+            })
+            .eq('id', orderId);
+
+        if (error) {
+
+            console.error(
+                'Ошибка завершения заявки:',
+                error
+            );
+
+            alert(
+                'Не удалось подтвердить выдачу.\n\n' +
+                error.message
+            );
+
+            return;
+        }
+
+        // Уведомление пользователю
+        const { error: notificationError } =
+            await supabaseClient
+                .from('notifications')
+                .insert({
+                    user_id: order.user_id,
+                    title: '🎉 Подарок получен!',
+                    message:
+                        'Твой подарок "' +
+                        order.prize_name +
+                        '" был успешно выдан. 🌿\n\n' +
+                        'Спасибо за участие в ЭкоГраде! 💚',
+                    type: 'reward',
+                    is_read: false
+                });
+
+        if (notificationError) {
+            console.error(
+                'Ошибка создания уведомления:',
+                notificationError
+            );
+        }
+
+        alert(
+            'Подарок успешно выдан! 🎁✅\n\n' +
+            'Пользователь получил уведомление.'
+        );
+
+        document.getElementById(
+            'pickupCodeInput'
+        ).value = '';
+
+        document.getElementById(
+            'pickupCodeResult'
+        ).innerHTML = '';
+
+        loadRewardOrders();
+    }
     function renderSupportMessages() {
         const chat = document.getElementById('supportChat');
 
@@ -4148,7 +4460,57 @@ function closeHistoryDetails() {
                     <b>${submission.tasks?.reward_points || 0} баллов</b>
                 </p>
 
-                <p>
+                <div style="
+                    margin-top:15px;
+                ">
+
+                    <p style="
+                        margin-bottom:8px;
+                    ">
+                        📷 <b>Фото-доказательство:</b>
+                    </p>
+
+                    ${
+                        submission.proof_image_url
+                        ? `
+                            <img
+                                src="${submission.proof_image_url}"
+                                alt="Фото-доказательство"
+                                style="
+                                    width:100%;
+                                    max-height:350px;
+                                    object-fit:contain;
+                                    border-radius:16px;
+                                    background:#f5f5f5;
+                                    cursor:pointer;
+                                "
+                                onclick="window.open(
+                                    '${submission.proof_image_url}',
+                                    '_blank'
+                                )"
+                            >
+
+                            <p style="
+                                color:#777;
+                                font-size:12px;
+                                margin-top:6px;
+                            ">
+                                Нажми на фотографию, чтобы открыть её полностью.
+                            </p>
+                        `
+                        : `
+                            <div style="
+                                background:#fff8e1;
+                                padding:12px;
+                                border-radius:12px;
+                                color:#8a6d1d;
+                            ">
+                                📷 Фотография не прикреплена
+                            </div>
+                        `
+                    }
+
+                </div>
                     📷 Фото:
                     <b>${submission.proof_text || 'не указано'}</b>
                 </p>
