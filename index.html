@@ -3525,14 +3525,14 @@ function closeHistoryDetails() {
 
         const confirmed = confirm(
             'Одобрить заявку на физический приз? 🎁\n\n' +
-            'Далее нужно будет указать информацию о получении.'
+            'После этого нужно будет указать информацию о получении.'
         );
 
         if (!confirmed) {
             return;
         }
 
-        // Получаем данные заявки
+        // Получаем заявку
         const { data: order, error: orderError } = await supabaseClient
             .from('reward_orders')
             .select('*')
@@ -3543,14 +3543,14 @@ function closeHistoryDetails() {
             console.error('Ошибка загрузки заявки:', orderError);
 
             alert(
-                'Не удалось загрузить данные заявки.\n' +
+                'Не удалось загрузить заявку.\n\n' +
                 'Попробуй ещё раз.'
             );
 
             return;
         }
 
-        // Способ получения
+        // Выбираем способ получения
         const pickupChoice = prompt(
             '📍 Как пользователь получит подарок?\n\n' +
             '1 — На школьном мероприятии\n' +
@@ -3572,15 +3572,39 @@ function closeHistoryDetails() {
             return;
         }
 
-        const pickupDate = prompt(
+        // Дата
+        const pickupDateInput = prompt(
             '📅 Введи дату получения.\n\n' +
+            'Формат: ДД.ММ.ГГГГ\n' +
             'Например: 15.10.2026'
         );
 
-        if (!pickupDate) {
+        if (!pickupDateInput) {
             return;
         }
 
+        const dateParts = pickupDateInput.split('.');
+
+        if (
+            dateParts.length !== 3 ||
+            dateParts[0].length !== 2 ||
+            dateParts[1].length !== 2 ||
+            dateParts[2].length !== 4
+        ) {
+            alert(
+                'Неверный формат даты.\n\n' +
+                'Используй, например: 15.10.2026'
+            );
+
+            return;
+        }
+
+        const pickupDate =
+            dateParts[2] + '-' +
+            dateParts[1] + '-' +
+            dateParts[0];
+
+        // Время
         const pickupTime = prompt(
             '🕐 Введи время получения.\n\n' +
             'Например: 13:30'
@@ -3590,6 +3614,7 @@ function closeHistoryDetails() {
             return;
         }
 
+        // Место
         const pickupLocation = prompt(
             '📍 Где пользователь должен получить подарок?\n\n' +
             'Например:\n' +
@@ -3602,14 +3627,21 @@ function closeHistoryDetails() {
             return;
         }
 
+        // Дополнительная информация
         const pickupComment = prompt(
-            '📝 Дополнительная информация (необязательно).\n\n' +
+            '📝 Дополнительная информация.\n\n' +
             'Например:\n' +
-            'Получение во время экологического мероприятия.\n' +
-            'Не забудь код заявки.'
+            'Получение во время экологического мероприятия.\n\n' +
+            'Можно оставить пустым.'
         ) || '';
 
-        // Одобряем заявку и сохраняем информацию о получении
+        // Автоматически создаём код получения
+        const pickupCode =
+            'ECO-' +
+            Math.random().toString(36).substring(2, 5).toUpperCase() +
+            Math.random().toString(36).substring(2, 5).toUpperCase();
+
+        // Одобряем заявку
         const { error } = await supabaseClient
             .from('reward_orders')
             .update({
@@ -3619,6 +3651,7 @@ function closeHistoryDetails() {
                 pickup_time: pickupTime,
                 pickup_location: pickupLocation,
                 pickup_comment: pickupComment,
+                pickup_code: pickupCode,
                 reviewed_at: new Date().toISOString()
             })
             .eq('id', orderId);
@@ -3631,19 +3664,20 @@ function closeHistoryDetails() {
 
             alert(
                 'Не удалось одобрить заявку.\n\n' +
-                'Попробуй ещё раз.'
+                'Ошибка: ' + error.message
             );
 
             return;
         }
 
-        // Создаём уведомление для пользователя
+        // Создаём уведомление пользователю
         const notificationMessage =
             'Твой подарок "' + order.prize_name + '" готов к выдаче! 🎁\n\n' +
             '📍 Способ получения: ' + pickupType + '\n' +
-            '📅 Дата: ' + pickupDate + '\n' +
+            '📅 Дата: ' + pickupDateInput + '\n' +
             '🕐 Время: ' + pickupTime + '\n' +
-            '📍 Место: ' + pickupLocation +
+            '📍 Место: ' + pickupLocation + '\n' +
+            '🔐 Код получения: ' + pickupCode +
             (pickupComment
                 ? '\n\n📝 ' + pickupComment
                 : '');
@@ -3667,7 +3701,8 @@ function closeHistoryDetails() {
 
         alert(
             'Заявка одобрена! ✅\n\n' +
-            'Информация о получении сохранена.\n' +
+            '🎁 ' + order.prize_name + '\n' +
+            '🔐 Код получения: ' + pickupCode + '\n\n' +
             'Пользователь получил уведомление 🔔'
         );
 
