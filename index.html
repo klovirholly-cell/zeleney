@@ -1205,6 +1205,12 @@
                 id="nameInput"
                 placeholder="Введи своё имя"
             >
+
+            <input
+                type="password"
+                id="developerCodeInput"
+                placeholder="Код разработчика (необязательно)"
+            >
     
             <button onclick="registerUser()">
                 Продолжить
@@ -1637,7 +1643,7 @@
                 <span>Чат поддержки</span>
                 <span class="menu-arrow">›</span>
             </div>
-            <button onclick="openAdminPanel()" style="
+            <button id="adminButton" onclick="openAdminPanel()" style="
             margin-top:20px;
             width:100%;
             padding:14px;
@@ -1885,10 +1891,18 @@
     
     function registerUser() {
         const name = document.getElementById('nameInput').value.trim();
+        const developerCode = document.getElementById('developerCodeInput').value.trim();
 
         if (name === '') {
             alert('Пожалуйста, введи своё имя 🌱');
             return;
+        }
+
+        // Проверяем код разработчика
+        if (developerCode === 'ECO2026') {
+            localStorage.setItem('isAdmin', 'true');
+        } else {
+            localStorage.setItem('isAdmin', 'false');
         }
 
         localStorage.setItem('userName', name);
@@ -1907,6 +1921,8 @@
         document.getElementById('profileUserName').textContent = name;
 
         document.getElementById('registrationScreen').style.display = 'none';
+
+        updateAdminButton();
 
         alert('Добро пожаловать, ' + name + '! 💚');
     }
@@ -2930,12 +2946,9 @@ function closeHistoryDetails() {
         checkApprovedTasks();
     }, 1000);
     function openAdminPanel() {
-        const userName = localStorage.getItem('userName');
+        const isAdmin = localStorage.getItem('isAdmin');
 
-        if (
-            !userName ||
-            !['ира', 'алиса'].includes(userName.trim().toLowerCase())
-        ) {
+        if (isAdmin !== 'true') {
             alert('Доступ запрещён 🔒');
             return;
         }
@@ -2945,7 +2958,7 @@ function closeHistoryDetails() {
     }
 
     function closeAdminPanel() {
-        showScreen('profileScreen');
+        showScreen('profile');
     }
 
     async function loadAdminSubmissions() {
@@ -3295,14 +3308,11 @@ function closeHistoryDetails() {
     }
     function updateAdminButton() {
         const adminButton = document.getElementById('adminButton');
-        const userName = localStorage.getItem('userName');
+        const isAdmin = localStorage.getItem('isAdmin');
 
         if (!adminButton) return;
 
-        if (
-            userName &&
-            ['ира', 'алиса'].includes(userName.trim().toLowerCase())
-        ) {
+        if (isAdmin === 'true') {
             adminButton.style.display = 'block';
         } else {
             adminButton.style.display = 'none';
