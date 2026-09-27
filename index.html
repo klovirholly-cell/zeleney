@@ -2183,24 +2183,50 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
+        const receiveMethod = prompt(
+            '🎁 Как ты хочешь получить подарок?\n\n' +
+            'Напиши один вариант:\n' +
+            '1 — У организатора проекта\n' +
+            '2 — В школе / на мероприятии'
+        );
+
+        if (!receiveMethod) {
+            return;
+        }
+
+        let deliveryMethod = '';
+
+        if (receiveMethod === '1') {
+            deliveryMethod = 'У организатора проекта';
+        } else if (receiveMethod === '2') {
+            deliveryMethod = 'В школе / на мероприятии';
+        } else {
+            alert(
+                'Пожалуйста, введи только 1 или 2 🌿'
+            );
+            return;
+        }
+
         const confirmed = confirm(
-            'Обменять ' + price + ' 🌿 на:\n\n' +
-            prizeName + '?\n\n' +
-            'После подтверждения баллы будут списаны.'
+            '🎁 Заявка на подарок\n\n' +
+            'Подарок: ' + prizeName + '\n' +
+            'Стоимость: ' + price + ' 🌿\n' +
+            'Получение: ' + deliveryMethod + '\n\n' +
+            'Отправить заявку администратору?'
         );
 
         if (!confirmed) {
             return;
         }
 
-        // Создаём заявку на получение приза
         const { error } = await supabaseClient
             .from('reward_orders')
             .insert({
                 user_id: userName,
                 prize_name: prizeName,
                 price: price,
-                status: 'pending'
+                status: 'pending',
+                delivery_method: deliveryMethod
             });
 
         if (error) {
@@ -2214,7 +2240,6 @@ window.addEventListener('DOMContentLoaded', loadUser);
             return;
         }
 
-        // Списываем баллы только после успешного создания заявки
         const newPoints = currentPoints - price;
 
         localStorage.setItem(
@@ -2230,7 +2255,8 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         alert(
             '🎉 Заявка оформлена!\n\n' +
-            prizeName + '\n\n' +
+            prizeName + '\n' +
+            'Получение: ' + deliveryMethod + '\n\n' +
             'Списано: ' + price + ' 🌿\n' +
             'Осталось: ' + newPoints + ' 🌿\n\n' +
             'Заявка отправлена администратору.'
@@ -3333,11 +3359,14 @@ function closeHistoryDetails() {
         const { data, error } = await supabaseClient
             .from('reward_orders')
             .select('*')
-            .eq('status', 'pending')
+            .in('status', ['pending', 'approved'])
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error('Ошибка загрузки заявок на призы:', error);
+            console.error(
+                'Ошибка загрузки заявок на призы:',
+                error
+            );
 
             container.innerHTML = `
                 <h2 style="color:#315f3b;">
@@ -3374,12 +3403,11 @@ function closeHistoryDetails() {
                     <div style="font-size:45px;">🎁</div>
 
                     <h3>
-                        Заявок на призы пока нет
+                        Активных заявок на призы нет
                     </h3>
 
                     <p>
-                        Когда пользователь обменяет баллы,
-                        заявка появится здесь.
+                        Новые заявки появятся здесь.
                     </p>
                 </div>
             `;
@@ -3395,58 +3423,100 @@ function closeHistoryDetails() {
                 🎁 Заявки на физические призы
             </h2>
 
-            ${data.map(order => `
-                <div style="
-                    background:white;
-                    padding:20px;
-                    border-radius:20px;
-                    margin-bottom:15px;
-                    box-shadow:0 3px 12px rgba(0,0,0,0.06);
-                ">
+            ${data.map(order => {
 
-                    <h3 style="
-                        margin-top:0;
-                        color:#315f3b;
+                const isPending = order.status === 'pending';
+
+                return `
+                    <div style="
+                        background:white;
+                        padding:20px;
+                        border-radius:20px;
+                        margin-bottom:15px;
+                        box-shadow:0 3px 12px rgba(0,0,0,0.06);
                     ">
-                        🎁 ${order.prize_name}
-                    </h3>
 
-                    <p>
-                        👤 Пользователь:
-                        <b>${order.user_id}</b>
-                    </p>
+                        <h3 style="
+                            margin-top:0;
+                            color:#315f3b;
+                        ">
+                            🎁 ${order.prize_name}
+                        </h3>
 
-                    <p>
-                        🌿 Стоимость:
-                        <b>${order.price} баллов</b>
-                    </p>
+                        <p>
+                            👤 Пользователь:
+                            <b>${order.user_id}</b>
+                        </p>
 
-                    <p style="
-                        color:#999;
-                        font-size:13px;
-                    ">
-                        Заявка №${order.id}
-                    </p>
+                        <p>
+                            🌿 Стоимость:
+                            <b>${order.price} баллов</b>
+                        </p>
 
-                    <button
-                        onclick="approveRewardOrder(${order.id})"
-                        style="
-                            width:100%;
-                            padding:13px;
-                            border:none;
-                            border-radius:14px;
-                            background:#4CAF50;
-                            color:white;
-                            font-size:15px;
-                            font-weight:bold;
-                            cursor:pointer;
-                        "
-                    >
-                        ✅ Выдать приз
-                    </button>
+                        <p>
+                            📍 Получение:
+                            <b>
+                                ${order.delivery_method || 'Не указано'}
+                            </b>
+                        </p>
 
-                </div>
-            `).join('')}
+                        <p>
+                            ${isPending
+                                ? '⏳ Статус: ожидает подтверждения'
+                                : '✅ Статус: одобрено, ожидает выдачи'
+                            }
+                        </p>
+
+                        <p style="
+                            color:#999;
+                            font-size:13px;
+                        ">
+                            Заявка №${order.id}
+                        </p>
+
+                        ${
+                            isPending
+                            ? `
+                                <button
+                                    onclick="approveRewardOrder(${order.id})"
+                                    style="
+                                        width:100%;
+                                        padding:13px;
+                                        border:none;
+                                        border-radius:14px;
+                                        background:#4CAF50;
+                                        color:white;
+                                        font-size:15px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                    "
+                                >
+                                    ✅ Одобрить заявку
+                                </button>
+                            `
+                            : `
+                                <button
+                                    onclick="completeRewardOrder(${order.id})"
+                                    style="
+                                        width:100%;
+                                        padding:13px;
+                                        border:none;
+                                        border-radius:14px;
+                                        background:#66bb6a;
+                                        color:white;
+                                        font-size:15px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                    "
+                                >
+                                    📦 Подарок выдан
+                                </button>
+                            `
+                        }
+
+                    </div>
+                `;
+            }).join('')}
         `;
     }
 
@@ -3454,7 +3524,47 @@ function closeHistoryDetails() {
     async function approveRewardOrder(orderId) {
 
         const confirmed = confirm(
-            'Подтвердить выдачу этого физического приза? 🎁'
+            'Одобрить заявку на этот физический приз? 🎁\n\n' +
+            'После одобрения подарок ещё НЕ будет отмечен как выдан.'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('reward_orders')
+            .update({
+                status: 'approved',
+                reviewed_at: new Date().toISOString()
+            })
+            .eq('id', orderId);
+
+        if (error) {
+            console.error(
+                'Ошибка одобрения заявки:',
+                error
+            );
+
+            alert(
+                'Не удалось одобрить заявку.\n' +
+                'Попробуй ещё раз.'
+            );
+
+            return;
+        }
+
+        alert(
+            'Заявка одобрена! ✅\n\n' +
+            'Теперь подарок можно выдать пользователю.'
+        );
+
+        loadRewardOrders();
+    }
+    async function completeRewardOrder(orderId) {
+
+        const confirmed = confirm(
+            'Подарок действительно выдан пользователю? 📦🎁'
         );
 
         if (!confirmed) {
@@ -3476,14 +3586,14 @@ function closeHistoryDetails() {
             );
 
             alert(
-                'Не удалось подтвердить выдачу приза.\n' +
+                'Не удалось отметить подарок как выданный.\n' +
                 'Попробуй ещё раз.'
             );
 
             return;
         }
 
-        alert('Приз отмечен как выдан! 🎁✅');
+        alert('Подарок отмечен как выдан! 📦✅');
 
         loadRewardOrders();
     }
