@@ -3524,18 +3524,101 @@ function closeHistoryDetails() {
     async function approveRewardOrder(orderId) {
 
         const confirmed = confirm(
-            'Одобрить заявку на этот физический приз? 🎁\n\n' +
-            'После одобрения подарок ещё НЕ будет отмечен как выдан.'
+            'Одобрить заявку на физический приз? 🎁\n\n' +
+            'Далее нужно будет указать информацию о получении.'
         );
 
         if (!confirmed) {
             return;
         }
 
+        // Получаем данные заявки
+        const { data: order, error: orderError } = await supabaseClient
+            .from('reward_orders')
+            .select('*')
+            .eq('id', orderId)
+            .single();
+
+        if (orderError || !order) {
+            console.error('Ошибка загрузки заявки:', orderError);
+
+            alert(
+                'Не удалось загрузить данные заявки.\n' +
+                'Попробуй ещё раз.'
+            );
+
+            return;
+        }
+
+        // Способ получения
+        const pickupChoice = prompt(
+            '📍 Как пользователь получит подарок?\n\n' +
+            '1 — На школьном мероприятии\n' +
+            '2 — Самостоятельно забрать'
+        );
+
+        if (!pickupChoice) {
+            return;
+        }
+
+        let pickupType = '';
+
+        if (pickupChoice === '1') {
+            pickupType = '🏫 Школьное мероприятие';
+        } else if (pickupChoice === '2') {
+            pickupType = '📍 Самостоятельное получение';
+        } else {
+            alert('Пожалуйста, введи только 1 или 2.');
+            return;
+        }
+
+        const pickupDate = prompt(
+            '📅 Введи дату получения.\n\n' +
+            'Например: 15.10.2026'
+        );
+
+        if (!pickupDate) {
+            return;
+        }
+
+        const pickupTime = prompt(
+            '🕐 Введи время получения.\n\n' +
+            'Например: 13:30'
+        );
+
+        if (!pickupTime) {
+            return;
+        }
+
+        const pickupLocation = prompt(
+            '📍 Где пользователь должен получить подарок?\n\n' +
+            'Например:\n' +
+            'Актовый зал школы №15\n' +
+            'или\n' +
+            'Молодёжный экологический центр, ул. Ленина, 10'
+        );
+
+        if (!pickupLocation) {
+            return;
+        }
+
+        const pickupComment = prompt(
+            '📝 Дополнительная информация (необязательно).\n\n' +
+            'Например:\n' +
+            'Получение во время экологического мероприятия.\n' +
+            'Не забудь код заявки.'
+        ) || '';
+
+        // Одобряем заявку и сохраняем информацию о получении
         const { error } = await supabaseClient
             .from('reward_orders')
             .update({
                 status: 'approved',
+                pickup_type: pickupType,
+                pickup_date: pickupDate,
+                pickup_time: pickupTime,
+                pickup_location: pickupLocation,
+                pickup_comment: pickupComment,
                 reviewed_at: new Date().toISOString()
             })
             .eq('id', orderId);
@@ -3547,16 +3630,45 @@ function closeHistoryDetails() {
             );
 
             alert(
-                'Не удалось одобрить заявку.\n' +
+                'Не удалось одобрить заявку.\n\n' +
                 'Попробуй ещё раз.'
             );
 
             return;
         }
 
+        // Создаём уведомление для пользователя
+        const notificationMessage =
+            'Твой подарок "' + order.prize_name + '" готов к выдаче! 🎁\n\n' +
+            '📍 Способ получения: ' + pickupType + '\n' +
+            '📅 Дата: ' + pickupDate + '\n' +
+            '🕐 Время: ' + pickupTime + '\n' +
+            '📍 Место: ' + pickupLocation +
+            (pickupComment
+                ? '\n\n📝 ' + pickupComment
+                : '');
+
+        const { error: notificationError } = await supabaseClient
+            .from('notifications')
+            .insert({
+                user_id: order.user_id,
+                title: '🎁 Подарок готов к выдаче!',
+                message: notificationMessage,
+                type: 'reward',
+                is_read: false
+            });
+
+        if (notificationError) {
+            console.error(
+                'Ошибка создания уведомления:',
+                notificationError
+            );
+        }
+
         alert(
             'Заявка одобрена! ✅\n\n' +
-            'Теперь подарок можно выдать пользователю.'
+            'Информация о получении сохранена.\n' +
+            'Пользователь получил уведомление 🔔'
         );
 
         loadRewardOrders();
