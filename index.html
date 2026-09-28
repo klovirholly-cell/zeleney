@@ -4618,26 +4618,107 @@ function closeHistoryDetails() {
             'Причина отклонения (можно оставить пустым):'
         );
 
-        const { error } = await supabaseClient
-            .from('task_submissions')
-            .update({
-                status: 'rejected',
-                admin_comment: comment || 'Задание не подтверждено',
-                reviewed_at: new Date().toISOString()
-            })
-            .eq('id', submissionId);
+        const rejectionReason =
+            comment || 'Задание не подтверждено';
 
-        if (error) {
-            console.error('Ошибка отклонения:', error);
+        // Сначала получаем заявку и пользователя
+        const { data: submission, error: submissionError } =
+            await supabaseClient
+                .from('task_submissions')
+                .select(`
+                    id,
+                    user_id,
+                    tasks (
+                        title
+                    )
+                `)
+                .eq('id', submissionId)
+                .maybeSingle();
+
+        if (submissionError || !submission) {
+
+            console.error(
+                'Ошибка получения заявки:',
+                submissionError
+            );
 
             alert(
-                'Не удалось отклонить задание.\nПопробуй ещё раз.'
+                'Не удалось получить данные заявки.\n' +
+                'Попробуй ещё раз.'
             );
 
             return;
         }
 
-        alert('Задание отклонено ❌');
+        // Отклоняем заявку
+        const { error } = await supabaseClient
+            .from('task_submissions')
+            .update({
+                status: 'rejected',
+                admin_comment: rejectionReason,
+                reviewed_at: new Date().toISOString()
+            })
+            .eq('id', submissionId);
+
+        if (error) {
+
+            console.error(
+                'Ошибка отклонения:',
+                error
+            );
+
+            alert(
+                'Не удалось отклонить задание.\n' +
+                'Попробуй ещё раз.'
+            );
+
+            return;
+        }
+
+        // Создаём уведомление пользователю
+        const taskTitle =
+            submission.tasks?.title || 'Экологическое задание';
+
+        const notificationMessage =
+            'Твоя заявка на задание «' +
+            taskTitle +
+            '» была отклонена. ❌\n\n' +
+            'Причина: ' +
+            rejectionReason;
+
+        const { error: notificationError } =
+            await supabaseClient
+                .from('notifications')
+                .insert({
+                    user_id: submission.user_id,
+                    title: '❌ Задание отклонено',
+                    message: notificationMessage,
+                    type: 'task_rejected',
+                    is_read: false
+                });
+
+        if (notificationError) {
+
+            console.error(
+                'Ошибка создания уведомления:',
+                notificationError
+            );
+
+            alert(
+                'Задание отклонено, но уведомление пользователю ' +
+                'не удалось отправить.\n\n' +
+                notificationError.message
+            );
+
+            loadAdminSubmissions();
+
+            return;
+        }
+
+        alert(
+            'Задание отклонено ❌\n\n' +
+            'Пользователь получил уведомление 🔔'
+        );
 
         loadAdminSubmissions();
     }
