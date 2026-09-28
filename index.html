@@ -2171,6 +2171,97 @@
                 </p>
 
             </div>
+            <div id="adminSupport" style="
+    margin-top:25px;
+    background:#f1f8e9;
+    padding:18px;
+    border-radius:20px;
+">
+
+    <h2 style="
+        color:#315f3b;
+        margin-top:0;
+    ">
+        💬 Чат поддержки
+    </h2>
+
+    <div id="adminSupportUsers">
+        <p style="color:#777;text-align:center;">
+            Загрузка обращений...
+        </p>
+    </div>
+
+    <div id="adminSupportChat" style="
+        display:none;
+        margin-top:15px;
+    ">
+
+        <button
+            onclick="closeAdminSupportChat()"
+            style="
+                border:none;
+                background:white;
+                padding:8px 12px;
+                border-radius:12px;
+                cursor:pointer;
+                margin-bottom:12px;
+            "
+        >
+            ← Назад к обращениям
+        </button>
+
+        <div
+            id="adminSupportMessages"
+            style="
+                background:white;
+                border-radius:18px;
+                padding:12px;
+                min-height:150px;
+                max-height:350px;
+                overflow-y:auto;
+            "
+        ></div>
+
+        <div style="
+            display:flex;
+            gap:8px;
+            margin-top:10px;
+        ">
+
+            <input
+                id="adminSupportInput"
+                type="text"
+                placeholder="Ответить пользователю..."
+                style="
+                    flex:1;
+                    padding:13px;
+                    border:1px solid #c8e6c9;
+                    border-radius:14px;
+                    font-size:15px;
+                    box-sizing:border-box;
+                "
+            >
+
+            <button
+                onclick="sendAdminSupportReply()"
+                style="
+                    width:52px;
+                    border:none;
+                    border-radius:14px;
+                    background:#4CAF50;
+                    color:white;
+                    font-size:20px;
+                    cursor:pointer;
+                "
+            >
+                ➤
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
         </section>
         <!-- НИЖНЕЕ МЕНЮ -->
 
@@ -3829,18 +3920,21 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         const text = input.value.trim();
 
-        if (!text) {
+        if (!text) return;
+
+        const userId = localStorage.getItem('userId');
+        const userName =
+            localStorage.getItem('userName') || 'Пользователь';
+
+        if (!userId) {
+            alert('Не удалось определить пользователя 😔');
             return;
         }
 
-        const userName =
-            localStorage.getItem('userName') || 'Гость';
-
-        // Отправляем сообщение в Supabase
         const { error } = await supabaseClient
             .from('support_messages')
             .insert({
-                user_id: userName,
+                user_id: userId,
                 user_name: userName,
                 message: text,
                 sender: 'user',
@@ -3848,26 +3942,14 @@ window.addEventListener('DOMContentLoaded', loadUser);
             });
 
         if (error) {
-
-            console.error(
-                'Ошибка отправки сообщения:',
-                error
-            );
-
-            alert(
-                'Не удалось отправить сообщение 😔\n\n' +
-                error.message
-            );
-
+            console.error('Ошибка отправки сообщения:', error);
+            alert('Не удалось отправить сообщение 😔');
             return;
         }
 
         input.value = '';
 
-        // Обновляем чат
         await loadSupportMessages();
-
-        alert('Сообщение отправлено в поддержку! 💚');
     }
     function addHistory(icon, title, place) {
     
@@ -4017,6 +4099,7 @@ function closeHistoryDetails() {
         showScreen('adminScreen');
         loadAdminSubmissions();
         loadRewardOrders();
+        loadAdminSupport();
     }
     function closeAdminPanel() {
         showScreen('profile');
@@ -4922,6 +5005,330 @@ function closeHistoryDetails() {
     }
 
     updateAdminButton();
+    async function loadAdminSupport() {
+
+        const container =
+            document.getElementById('adminSupportUsers');
+
+        if (!container) return;
+
+        container.innerHTML = `
+            <p style="color:#777;text-align:center;">
+                Загрузка обращений...
+            </p>
+        `;
+
+        const { data, error } = await supabaseClient
+            .from('support_messages')
+            .select('*')
+            .order('created_at', {
+                ascending: false
+            });
+
+        if (error) {
+
+            console.error(
+                'Ошибка загрузки поддержки:',
+                error
+            );
+
+            container.innerHTML = `
+                <div style="
+                    background:#fff0f0;
+                    padding:15px;
+                    border-radius:15px;
+                    color:#c62828;
+                ">
+                    ❌ Не удалось загрузить обращения.
+                </div>
+            `;
+
+            return;
+        }
+
+        if (!data || data.length === 0) {
+
+            container.innerHTML = `
+                <div style="
+                    background:white;
+                    padding:20px;
+                    border-radius:16px;
+                    text-align:center;
+                    color:#777;
+                ">
+                    💬 Пока обращений нет.
+                </div>
+            `;
+
+            return;
+        }
+
+        const users = {};
+
+        data.forEach(message => {
+
+            if (!users[message.user_id]) {
+                users[message.user_id] = {
+                    user_id: message.user_id,
+                    user_name: message.user_name,
+                    lastMessage: message.message,
+                    unread: 0
+                };
+            }
+
+            if (
+                message.sender === 'user' &&
+                message.is_read === false
+            ) {
+                users[message.user_id].unread++;
+            }
+        });
+
+        container.innerHTML = '';
+
+        Object.values(users).forEach(user => {
+
+            const item = document.createElement('div');
+
+            item.style.cssText = `
+                background:white;
+                padding:15px;
+                border-radius:16px;
+                margin-bottom:10px;
+                cursor:pointer;
+                box-shadow:0 3px 10px rgba(80,120,70,0.08);
+            `;
+
+            item.innerHTML = `
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                ">
+
+                    <b style="color:#315f3b;">
+                        👤 ${user.user_name}
+                    </b>
+
+                    ${
+                        user.unread > 0
+                        ? `
+                            <span style="
+                                background:#4CAF50;
+                                color:white;
+                                border-radius:20px;
+                                padding:4px 9px;
+                                font-size:12px;
+                            ">
+                                ${user.unread}
+                            </span>
+                        `
+                        : ''
+                    }
+
+                </div>
+
+                <div style="
+                    color:#777;
+                    font-size:14px;
+                    margin-top:6px;
+                    overflow:hidden;
+                    white-space:nowrap;
+                    text-overflow:ellipsis;
+                ">
+                    ${user.lastMessage}
+                </div>
+            `;
+
+            item.onclick = function() {
+                openAdminSupportChat(
+                    user.user_id,
+                    user.user_name
+                );
+            };
+
+            container.appendChild(item);
+        });
+    }
+
+
+    async function openAdminSupportChat(
+        userId,
+        userName
+    ) {
+
+        window.currentSupportUserId = userId;
+        window.currentSupportUserName = userName;
+
+        document.getElementById(
+            'adminSupportUsers'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'adminSupportChat'
+        ).style.display = 'block';
+
+        await supabaseClient
+            .from('support_messages')
+            .update({
+                is_read: true
+            })
+            .eq('user_id', userId)
+            .eq('sender', 'user');
+
+        await loadAdminSupportMessages();
+    }
+
+
+    async function loadAdminSupportMessages() {
+
+        const container =
+            document.getElementById(
+                'adminSupportMessages'
+            );
+
+        if (!container) return;
+
+        const userId =
+            window.currentSupportUserId;
+
+        if (!userId) return;
+
+        const { data, error } =
+            await supabaseClient
+                .from('support_messages')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', {
+                    ascending: true
+                });
+
+        if (error) {
+
+            console.error(
+                'Ошибка загрузки чата:',
+                error
+            );
+
+            return;
+        }
+
+        container.innerHTML = '';
+
+        data.forEach(item => {
+
+            const message =
+                document.createElement('div');
+
+            if (item.sender === 'user') {
+
+                message.style.cssText = `
+                    background:#DFF0DA;
+                    padding:10px 13px;
+                    border-radius:15px;
+                    margin:8px 0 8px auto;
+                    max-width:80%;
+                    width:max-content;
+                `;
+
+                message.textContent = item.message;
+
+            } else {
+
+                message.style.cssText = `
+                    background:#E8F5E9;
+                    padding:10px 13px;
+                    border-radius:15px;
+                    margin:8px auto 8px 0;
+                    max-width:80%;
+                    width:max-content;
+                `;
+
+                message.innerHTML = `
+                    <b>🌿 Администратор</b>
+                    <div style="margin-top:4px;">
+                        ${item.message}
+                    </div>
+                `;
+            }
+
+            container.appendChild(message);
+        });
+
+        container.scrollTop =
+            container.scrollHeight;
+    }
+
+
+    async function sendAdminSupportReply() {
+
+        const input =
+            document.getElementById(
+                'adminSupportInput'
+            );
+
+        if (!input) return;
+
+        const text =
+            input.value.trim();
+
+        if (!text) return;
+
+        const userId =
+            window.currentSupportUserId;
+
+        const userName =
+            window.currentSupportUserName ||
+            'Пользователь';
+
+        if (!userId) return;
+
+        const { error } =
+            await supabaseClient
+                .from('support_messages')
+                .insert({
+                    user_id: userId,
+                    user_name: userName,
+                    message: text,
+                    sender: 'admin',
+                    is_read: false
+                });
+
+        if (error) {
+
+            console.error(
+                'Ошибка отправки ответа:',
+                error
+            );
+
+            alert(
+                'Не удалось отправить ответ 😔'
+            );
+
+            return;
+        }
+
+        input.value = '';
+
+        await loadAdminSupportMessages();
+    }
+
+
+    function closeAdminSupportChat() {
+
+        window.currentSupportUserId = null;
+        window.currentSupportUserName = null;
+
+        document.getElementById(
+            'adminSupportChat'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'adminSupportUsers'
+        ).style.display = 'block';
+
+        loadAdminSupport();
+    }
     </script>
     </body>
     </html>
