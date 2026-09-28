@@ -3731,76 +3731,143 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
 
     // Загружаем сохранённые сообщения
-    function loadSupportMessages() {
-        const chat = document.getElementById('supportChat');
+    async function loadSupportMessages() {
+
+        const chat =
+            document.getElementById('supportChat');
 
         if (!chat) return;
 
-        const messages =
-            JSON.parse(localStorage.getItem('supportMessages')) || [];
+        const userName =
+            localStorage.getItem('userName') || 'Гость';
 
-        messages.forEach(item => {
-            const message = document.createElement('div');
+        const { data, error } =
+            await supabaseClient
+                .from('support_messages')
+                .select('*')
+                .eq('user_id', userName)
+                .order('created_at', {
+                    ascending: true
+                });
 
-            message.style.cssText = `
-                background: #DFF0DA;
-                padding: 12px 15px;
-                border-radius: 16px;
-                margin: 10px 0 10px auto;
-                max-width: 85%;
-                text-align: left;
-            `;
+        if (error) {
 
-            message.textContent = item.text;
+            console.error(
+                'Ошибка загрузки поддержки:',
+                error
+            );
+
+            return;
+        }
+
+        chat.innerHTML = `
+            <div style="
+                background:#E8F5E9;
+                padding:12px 15px;
+                border-radius:16px;
+                margin-bottom:10px;
+                max-width:85%;
+            ">
+                <b>🌿 Поддержка</b>
+                <p style="margin:5px 0 0;">
+                    Привет! 👋 Расскажи, какая проблема возникла,
+                    и мы постараемся помочь.
+                </p>
+            </div>
+        `;
+
+        data.forEach(item => {
+
+            const message =
+                document.createElement('div');
+
+            if (item.sender === 'user') {
+
+                message.style.cssText = `
+                    background:#DFF0DA;
+                    padding:12px 15px;
+                    border-radius:16px;
+                    margin:10px 0 10px auto;
+                    max-width:85%;
+                `;
+
+                message.innerHTML = `
+                    <b>👤 ${item.user_name}</b>
+                    <p style="margin:5px 0 0;">
+                        ${item.message}
+                    </p>
+                `;
+
+            } else {
+
+                message.style.cssText = `
+                    background:#E8F5E9;
+                    padding:12px 15px;
+                    border-radius:16px;
+                    margin:10px auto 10px 0;
+                    max-width:85%;
+                `;
+
+                message.innerHTML = `
+                    <b>🌿 Поддержка</b>
+                    <p style="margin:5px 0 0;">
+                        ${item.message}
+                    </p>
+                `;
+            }
+
             chat.appendChild(message);
         });
 
         chat.scrollTop = chat.scrollHeight;
     }
-    function sendSupportMessage() {
+    async function sendSupportMessage() {
+
         const input = document.getElementById('supportInput');
 
         if (!input) return;
 
         const text = input.value.trim();
 
-        if (!text) return;
+        if (!text) {
+            return;
+        }
 
-        let messages =
-            JSON.parse(localStorage.getItem('supportMessages')) || [];
+        const userName =
+            localStorage.getItem('userName') || 'Гость';
 
-        messages.push({
-            type: 'user',
-            text: text
-        });
+        // Отправляем сообщение в Supabase
+        const { error } = await supabaseClient
+            .from('support_messages')
+            .insert({
+                user_id: userName,
+                user_name: userName,
+                message: text,
+                sender: 'user',
+                is_read: false
+            });
 
-        localStorage.setItem(
-            'supportMessages',
-            JSON.stringify(messages)
-        );
+        if (error) {
+
+            console.error(
+                'Ошибка отправки сообщения:',
+                error
+            );
+
+            alert(
+                'Не удалось отправить сообщение 😔\n\n' +
+                error.message
+            );
+
+            return;
+        }
 
         input.value = '';
 
-        renderSupportMessages();
+        // Обновляем чат
+        await loadSupportMessages();
 
-        setTimeout(function() {
-
-            let messages =
-                JSON.parse(localStorage.getItem('supportMessages')) || [];
-
-            messages.push({
-                type: 'support',
-                text: 'Спасибо за сообщение! 🌿 Мы получили его и постараемся помочь.'
-            });
-
-            localStorage.setItem(
-                'supportMessages',
-                JSON.stringify(messages)
-            );
-
-            renderSupportMessages();
-
-        }, 500);
+        alert('Сообщение отправлено в поддержку! 💚');
     }
     function addHistory(icon, title, place) {
     
