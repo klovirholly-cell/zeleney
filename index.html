@@ -3824,32 +3824,9 @@ window.addEventListener('DOMContentLoaded', loadUser);
     // Загружаем сохранённые сообщения
     async function loadSupportMessages() {
 
-        const chat =
-            document.getElementById('supportChat');
+        const chat = document.getElementById('supportChat');
 
         if (!chat) return;
-
-        const userName =
-            localStorage.getItem('userName') || 'Гость';
-
-        const { data, error } =
-            await supabaseClient
-                .from('support_messages')
-                .select('*')
-                .eq('user_id', userName)
-                .order('created_at', {
-                    ascending: true
-                });
-
-        if (error) {
-
-            console.error(
-                'Ошибка загрузки поддержки:',
-                error
-            );
-
-            return;
-        }
 
         chat.innerHTML = `
             <div style="
@@ -3862,52 +3839,80 @@ window.addEventListener('DOMContentLoaded', loadUser);
                 <b>🌿 Поддержка</b>
                 <p style="margin:5px 0 0;">
                     Привет! 👋 Расскажи, какая проблема возникла,
-                    и мы постараемся помочь.
+                    и администратор постарается помочь.
                 </p>
             </div>
         `;
 
+        const userId =
+            localStorage.getItem('userId') ||
+            localStorage.getItem('userName') ||
+            'user';
+
+        const { data, error } = await supabaseClient
+            .from('support_messages')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', {
+                ascending: true
+            });
+
+        if (error) {
+            console.error(
+                'Ошибка загрузки поддержки:',
+                error
+            );
+
+            return;
+        }
+
+        if (!data) return;
+
         data.forEach(item => {
 
-            const message =
+            // Сообщение пользователя
+            const userMessage =
                 document.createElement('div');
 
-            if (item.sender === 'user') {
+            userMessage.style.cssText = `
+                background:#DFF0DA;
+                padding:12px 15px;
+                border-radius:16px;
+                margin:10px 0 10px auto;
+                max-width:85%;
+                width:max-content;
+            `;
 
-                message.style.cssText = `
-                    background:#DFF0DA;
-                    padding:12px 15px;
-                    border-radius:16px;
-                    margin:10px 0 10px auto;
-                    max-width:85%;
-                `;
+            userMessage.textContent = item.message;
 
-                message.innerHTML = `
-                    <b>👤 ${item.user_name}</b>
-                    <p style="margin:5px 0 0;">
-                        ${item.message}
-                    </p>
-                `;
+            chat.appendChild(userMessage);
 
-            } else {
 
-                message.style.cssText = `
+            // Ответ администратора
+            if (item.admin_reply) {
+
+                const adminMessage =
+                    document.createElement('div');
+
+                adminMessage.style.cssText = `
                     background:#E8F5E9;
                     padding:12px 15px;
                     border-radius:16px;
                     margin:10px auto 10px 0;
                     max-width:85%;
+                    width:max-content;
                 `;
 
-                message.innerHTML = `
-                    <b>🌿 Поддержка</b>
-                    <p style="margin:5px 0 0;">
-                        ${item.message}
-                    </p>
+                adminMessage.innerHTML = `
+                    <b>🌿 Администратор</b>
+                    <div style="margin-top:5px;">
+                        ${item.admin_reply}
+                    </div>
                 `;
+
+                chat.appendChild(adminMessage);
             }
 
-            chat.appendChild(message);
         });
 
         chat.scrollTop = chat.scrollHeight;
@@ -3922,28 +3927,31 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         if (!text) return;
 
-        const userId = localStorage.getItem('userId');
-        const userName =
-            localStorage.getItem('userName') || 'Пользователь';
-
-        if (!userId) {
-            alert('Не удалось определить пользователя 😔');
-            return;
-        }
+        const userId =
+            localStorage.getItem('userId') ||
+            localStorage.getItem('userName') ||
+            'user';
 
         const { error } = await supabaseClient
             .from('support_messages')
             .insert({
                 user_id: userId,
-                user_name: userName,
                 message: text,
-                sender: 'user',
-                is_read: false
+                sender: 'user'
             });
 
         if (error) {
-            console.error('Ошибка отправки сообщения:', error);
-            alert('Не удалось отправить сообщение 😔');
+
+            console.error(
+                'Ошибка отправки сообщения:',
+                error
+            );
+
+            alert(
+                'Не удалось отправить сообщение 😔\n\n' +
+                error.message
+            );
+
             return;
         }
 
