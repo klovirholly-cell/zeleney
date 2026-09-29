@@ -3045,7 +3045,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         closePlantModal();
     }
-    function addPlant(plantType = 'Растение', plantPlace = 'Только что') {
+    async function addPlant(plantType = 'Растение', plantPlace = 'Только что') {
         let plantCount = document.getElementById('plantCount');
         let progressText = document.getElementById('progressText');
         let progressPercent = document.getElementById('progressPercent');
@@ -3087,6 +3087,26 @@ window.addEventListener('DOMContentLoaded', loadUser);
                 'Посадила: ' + plantType,
                 '📍 ' + plantPlace
             );
+        }
+
+        // Сохраняем растение в Supabase
+        if (!window.helpingPoint) {
+            const userId =
+                localStorage.getItem('userId') ||
+                localStorage.getItem('userName') ||
+                'user';
+
+            const { error } = await supabaseClient
+                .from('plants')
+                .insert({
+                    user_id: userId,
+                    plant_type: plantType,
+                    place: plantPlace
+                });
+
+            if (error) {
+                console.error('Ошибка сохранения растения:', error);
+            }
         }
 
         alert('Растение добавлено! 🌱💚');
