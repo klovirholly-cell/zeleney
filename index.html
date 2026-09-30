@@ -4045,13 +4045,13 @@ window.addEventListener('DOMContentLoaded', loadUser);
             JSON.stringify(history)
         );
 
-        // ID текущего пользователя
+        // Получаем пользователя
         const userId =
             localStorage.getItem('userId') ||
             localStorage.getItem('userName') ||
             'user';
 
-        // Сохраняем в базу Supabase
+        // Сохраняем в Supabase
         const { error } = await supabaseClient
             .from('history')
             .insert({
