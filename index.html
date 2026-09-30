@@ -3836,43 +3836,57 @@ window.addEventListener('DOMContentLoaded', loadUser);
             });
 
         if (error) {
+
             console.error(
                 'Ошибка загрузки поддержки:',
                 error
             );
 
+            chat.innerHTML += `
+                <div style="
+                    background:#fff0f0;
+                    padding:12px;
+                    border-radius:15px;
+                    color:#c62828;
+                ">
+                    ❌ Не удалось загрузить сообщения.
+                </div>
+            `;
+
             return;
         }
 
-        if (!data) return;
+        if (!data || data.length === 0) {
+            chat.scrollTop = chat.scrollHeight;
+            return;
+        }
 
         data.forEach(item => {
 
-            // Сообщение пользователя
-            const userMessage =
+            const message =
                 document.createElement('div');
 
-            userMessage.style.cssText = `
-                background:#DFF0DA;
-                padding:12px 15px;
-                border-radius:16px;
-                margin:10px 0 10px auto;
-                max-width:85%;
-                width:max-content;
-            `;
+            if (item.sender === 'user') {
 
-            userMessage.textContent = item.message;
+                message.style.cssText = `
+                    background:#DFF0DA;
+                    padding:12px 15px;
+                    border-radius:16px;
+                    margin:10px 0 10px auto;
+                    max-width:85%;
+                    width:max-content;
+                `;
 
-            chat.appendChild(userMessage);
+                message.innerHTML = `
+                    <b>👤 Вы</b>
+                    <div style="margin-top:5px;">
+                        ${item.message || ''}
+                    </div>
+                `;
 
+            } else if (item.sender === 'admin') {
 
-            // Ответ администратора
-            if (item.admin_reply) {
-
-                const adminMessage =
-                    document.createElement('div');
-
-                adminMessage.style.cssText = `
+                message.style.cssText = `
                     background:#E8F5E9;
                     padding:12px 15px;
                     border-radius:16px;
@@ -3881,16 +3895,15 @@ window.addEventListener('DOMContentLoaded', loadUser);
                     width:max-content;
                 `;
 
-                adminMessage.innerHTML = `
+                message.innerHTML = `
                     <b>🌿 Администратор</b>
                     <div style="margin-top:5px;">
-                        ${item.admin_reply}
+                        ${item.message || ''}
                     </div>
                 `;
-
-                chat.appendChild(adminMessage);
             }
 
+            chat.appendChild(message);
         });
 
         chat.scrollTop = chat.scrollHeight;
@@ -3898,8 +3911,6 @@ window.addEventListener('DOMContentLoaded', loadUser);
     async function sendSupportMessage() {
 
         const input = document.getElementById('supportInput');
-
-        alert('Кнопка работает!');
 
         if (!input) {
             alert('Ошибка: поле сообщения не найдено');
