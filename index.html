@@ -3089,15 +3089,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
             );
         }
 
-        const { error: historyError } = await supabaseClient
-            .from('history')
-            .insert({
-                action: '🌱 Посадила: ' + plantType + ' 📍 ' + plantPlace
-            });
-
-        if (historyError) {
-            console.error('Ошибка сохранения истории:', historyError);
-        }
+        
 
         // Сохраняем растение в Supabase
         if (!window.helpingPoint) {
@@ -4051,7 +4043,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
             localStorage.getItem('userName') ||
             'user';
 
-        // Сохраняем в Supabase
+        // Сохраняем действие в Supabase
         const { error } = await supabaseClient
             .from('history')
             .insert({
