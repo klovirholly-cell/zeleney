@@ -3495,15 +3495,12 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
             window.helpingPoint = true;
 
-            addPlant();
-
-            window.helpingPoint = false;
-
-            addHistory(
-                '🌱',
-                'Помогла озеленению',
+            addPlant(
+                'Помощь озеленению',
                 pointName
             );
+
+            window.helpingPoint = false;
             if (window.selectedMarkerContent) {
                 window.selectedMarkerContent.textContent = '✅';
             }
@@ -3996,8 +3993,8 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         alert('Сообщение отправлено! 💚');
     }
-    function addHistory(icon, title, place) {
-    
+    async function addHistory(icon, title, place) {
+
         let historyList = document.getElementById('historyList');
 
         let item = document.createElement('div');
@@ -4039,6 +4036,17 @@ window.addEventListener('DOMContentLoaded', loadUser);
         });
 
         localStorage.setItem('history', JSON.stringify(history));
+
+        // Сохраняем действие в Supabase
+        const { error } = await supabaseClient
+            .from('history')
+            .insert({
+                action: icon + ' ' + title + ' 📍 ' + place
+            });
+
+        if (error) {
+            console.error('Ошибка сохранения истории:', error);
+        }
     }
 function showHistoryDetails(type, plantType, plantPlace) {
     let details = document.getElementById('historyDetails');
