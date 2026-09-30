@@ -4022,6 +4022,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         historyList.prepend(item);
 
+        // Сохраняем историю локально
         let history = JSON.parse(localStorage.getItem('history')) || [];
 
         history.unshift({
@@ -4037,15 +4038,26 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         localStorage.setItem('history', JSON.stringify(history));
 
-        // Сохраняем действие в Supabase
+        // Получаем ID пользователя
+        const userId =
+            localStorage.getItem('userId') ||
+            localStorage.getItem('userName') ||
+            'user';
+
+        // Сохраняем историю в Supabase
         const { error } = await supabaseClient
             .from('history')
             .insert({
-                action: icon + ' ' + title + ' 📍 ' + place
+                user_id: userId,
+                icon: icon,
+                title: title,
+                place: place
             });
 
         if (error) {
-            console.error('Ошибка сохранения истории:', error);
+            console.error('Ошибка сохранения истории в Supabase:', error);
+        } else {
+            console.log('История сохранена в Supabase 🌱');
         }
     }
 function showHistoryDetails(type, plantType, plantPlace) {
