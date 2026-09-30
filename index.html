@@ -3368,6 +3368,20 @@ window.addEventListener('DOMContentLoaded', loadUser);
     }
     function showScreen(screenName) {
 
+        if (window.supportRefreshInterval) {
+            clearInterval(window.supportRefreshInterval);
+            window.supportRefreshInterval = null;
+        }
+
+        if (screenName === 'support') {
+
+            loadSupportMessages();
+
+            window.supportRefreshInterval = setInterval(() => {
+                loadSupportMessages();
+            }, 3000);
+        }
+
         // Скрываем все экраны
         const screens = document.querySelectorAll('.screen');
 
