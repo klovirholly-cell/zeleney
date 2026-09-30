@@ -4011,10 +4011,13 @@ window.addEventListener('DOMContentLoaded', loadUser);
             <div>
                 <h4>${title}</h4>
                 <p>${place}</p>
-                <small>${new Date().toLocaleDateString('ru-RU')} · ${new Date().toLocaleTimeString('ru-RU', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}</small>
+                <small>
+                    ${new Date().toLocaleDateString('ru-RU')} ·
+                    ${new Date().toLocaleTimeString('ru-RU', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}
+                </small>
             </div>
 
             <div class="history-arrow">›</div>
@@ -4022,8 +4025,9 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         historyList.prepend(item);
 
-        // Сохраняем историю локально
-        let history = JSON.parse(localStorage.getItem('history')) || [];
+        // Сохраняем локально
+        let history =
+            JSON.parse(localStorage.getItem('history')) || [];
 
         history.unshift({
             icon: icon,
@@ -4036,15 +4040,18 @@ window.addEventListener('DOMContentLoaded', loadUser);
             })
         });
 
-        localStorage.setItem('history', JSON.stringify(history));
+        localStorage.setItem(
+            'history',
+            JSON.stringify(history)
+        );
 
-        // Получаем ID пользователя
+        // ID текущего пользователя
         const userId =
             localStorage.getItem('userId') ||
             localStorage.getItem('userName') ||
             'user';
 
-        // Сохраняем историю в Supabase
+        // Сохраняем в базу Supabase
         const { error } = await supabaseClient
             .from('history')
             .insert({
@@ -4055,9 +4062,14 @@ window.addEventListener('DOMContentLoaded', loadUser);
             });
 
         if (error) {
-            console.error('Ошибка сохранения истории в Supabase:', error);
+            console.error(
+                'Ошибка сохранения истории в Supabase:',
+                error
+            );
         } else {
-            console.log('История сохранена в Supabase 🌱');
+            console.log(
+                'История сохранена в Supabase 🌱'
+            );
         }
     }
 function showHistoryDetails(type, plantType, plantPlace) {
