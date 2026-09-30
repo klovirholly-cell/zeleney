@@ -3390,49 +3390,104 @@ window.addEventListener('DOMContentLoaded', loadUser);
         }
         if (screenName === 'history') {
 
+            loadHistoryFromSupabase();
+
+        }
+    }
+
+    async function loadHistoryFromSupabase() {
+
         const historyList = document.getElementById('historyList');
-        const history = JSON.parse(localStorage.getItem('history')) || [];
-        const emptyHistory = document.getElementById('emptyHistory');
+
+        historyList.innerHTML = `
+            <div style="text-align:center; padding:40px 20px; color:#777;">
+                🌱 Загружаем историю...
+            </div>
+        `;
+
+        const userId =
+            localStorage.getItem('userId') ||
+            localStorage.getItem('userName') ||
+            'user';
+
+        const { data, error } = await supabaseClient
+            .from('history')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+
+            console.error(
+                'Ошибка загрузки истории:',
+                error
+            );
+
+            historyList.innerHTML = `
+                <div style="text-align:center; padding:40px 20px; color:#777;">
+                    <div style="font-size:50px;">⚠️</div>
+                    <h3>Не удалось загрузить историю</h3>
+                    <p>Попробуй открыть раздел ещё раз.</p>
+                </div>
+            `;
+
+            return;
+        }
 
         historyList.innerHTML = '';
 
-        if (history.length === 0) {
+        if (!data || data.length === 0) {
 
             historyList.innerHTML = `
-                <div id="emptyHistory" style="text-align:center; padding:40px 20px; color:#777;">
+                <div style="text-align:center; padding:40px 20px; color:#777;">
                     <div style="font-size:50px;">🌱</div>
                     <h3>Пока здесь пусто</h3>
                     <p>Начни помогать озеленению — твои действия появятся здесь 💚</p>
                 </div>
             `;
 
-        } else {
-
-            history.forEach(item => {
-
-                const element = document.createElement('div');
-                element.className = 'history-item';
-
-                element.setAttribute(
-                    'onclick',
-                    `showHistoryDetails('plant', '${item.title}', '${item.place}')`
-                );
-
-                element.innerHTML = `
-                    <div class="history-icon">${item.icon}</div>
-
-                    <div>
-                        <h4>${item.title}</h4>
-                        <p>${item.place}</p>
-                        <small>${item.date || ''} · ${item.time || ''}</small>
-                    </div>
-
-                    <div class="history-arrow">›</div>
-                `;
-
-                historyList.appendChild(element);
-            });
+            return;
         }
+
+        data.forEach(item => {
+
+            const date = item.created_at
+                ? new Date(item.created_at)
+                : new Date();
+
+            const element = document.createElement('div');
+
+            element.className = 'history-item';
+
+            element.setAttribute(
+                'onclick',
+                `showHistoryDetails('plant', '${item.title}', '${item.place}')`
+            );
+
+            element.innerHTML = `
+                <div class="history-icon">
+                    ${item.icon || '🌱'}
+                </div>
+
+                <div>
+                    <h4>${item.title || 'Действие'}</h4>
+
+                    <p>${item.place || ''}</p>
+
+                    <small>
+                        ${date.toLocaleDateString('ru-RU')} ·
+                        ${date.toLocaleTimeString('ru-RU', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </small>
+                </div>
+
+                <div class="history-arrow">›</div>
+            `;
+
+            historyList.appendChild(element);
+        });
     }
 
 
