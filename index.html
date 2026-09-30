@@ -3366,6 +3366,21 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         await loadNotifications();
     }
+
+    if (window.supportRefreshInterval) {
+        clearInterval(window.supportRefreshInterval);
+        window.supportRefreshInterval = null;
+    }
+
+    if (screenName === 'support') {
+
+        loadSupportMessages();
+
+        window.supportRefreshInterval = setInterval(() => {
+            loadSupportMessages();
+        }, 3000);
+    }
+
     function showScreen(screenName) {
 
         if (window.supportRefreshInterval) {
