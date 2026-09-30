@@ -4043,7 +4043,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
             localStorage.getItem('userName') ||
             'user';
 
-        // Сохраняем действие в Supabase
+        // Сохраняем  в Supabase
         const { error } = await supabaseClient
             .from('history')
             .insert({
