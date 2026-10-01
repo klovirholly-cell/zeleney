@@ -1235,23 +1235,24 @@
 
     <div class="app">
 
-        <!-- ОКНО ЗАДАНИЯ ГОРОДА -->
+        <!-- ОКНО ЗАДАНИЙ ГОРОДА -->
         <div id="cityTaskModal" class="plant-modal">
+
             <div class="plant-modal-card">
 
                 <button class="plant-close" onclick="closeCityTask()">×</button>
 
                 <div class="plant-modal-icon">🎯</div>
 
-                <h2>Задание города</h2>
-                <div id="cityTaskStatus" style="margin: 15px 0; color: #5d9b58;">
-                    🎁 Награда: <b>100 🌿</b>
-                </div>
+                <h2>Задания города</h2>
+
                 <p>
-                    Помоги сделать город зеленее 🌱
+                    Выбери задание и помоги сделать город зеленее 🌱
                 </p>
 
+                <!-- ЗАДАНИЕ 1 -->
                 <div class="city-task-card">
+
                     <h3>🌳 Посади дерево</h3>
 
                     <p>
@@ -1261,13 +1262,97 @@
                     <div class="task-reward">
                         🎁 Награда: <b>100 🌿</b>
                     </div>
+
+                    <button
+                        class="plant-confirm"
+                        onclick="showCityTaskDetails('tree')"
+                    >
+                        Подробнее
+                    </button>
+
                 </div>
 
-                <button class="plant-confirm" onclick="startCityTask()">
+                <!-- ЗАДАНИЕ 2 -->
+                <div class="city-task-card">
+
+                    <h3>🌿 Посади кустарник</h3>
+
+                    <p>
+                        Посади кустарник возле указанной городской зоны.
+                    </p>
+
+                    <div class="task-reward">
+                        🎁 Награда: <b>70 🌿</b>
+                    </div>
+
+                    <button
+                        class="plant-confirm"
+                        onclick="showCityTaskDetails('bush')"
+                    >
+                        Подробнее
+                    </button>
+
+                </div>
+
+                <!-- ЗАДАНИЕ 3 -->
+                <div class="city-task-card">
+
+                    <h3>🌷 Укрась клумбу</h3>
+
+                    <p>
+                        Высади цветы на выбранной клумбе и отправь фотографию результата.
+                    </p>
+
+                    <div class="task-reward">
+                        🎁 Награда: <b>50 🌿</b>
+                    </div>
+
+                    <button
+                        class="plant-confirm"
+                        onclick="showCityTaskDetails('flowers')"
+                    >
+                        Подробнее
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ПОДРОБНОСТИ ЗАДАНИЯ -->
+        <div id="cityTaskDetailsModal" class="plant-modal">
+
+            <div class="plant-modal-card">
+
+                <button
+                    class="plant-close"
+                    onclick="closeCityTaskDetails()"
+                >
+                    ×
+                </button>
+
+                <div class="plant-modal-icon">🌱</div>
+
+                <h2 id="cityTaskDetailsTitle">
+                    Задание
+                </h2>
+
+                <div
+                    id="cityTaskDetailsText"
+                    style="text-align:left; margin:20px 0; line-height:1.6;"
+                >
+                </div>
+
+                <button
+                    class="plant-confirm"
+                    onclick="startSelectedCityTask()"
+                >
                     Выполнить задание 🌱
                 </button>
 
             </div>
+
         </div>
 
         <!-- ОКНО ПОДТВЕРЖДЕНИЯ ЗАДАНИЯ -->
@@ -2759,28 +2844,111 @@ window.addEventListener('DOMContentLoaded', loadUser);
         alert('Все данные сброшены 💚');
     }
     function openCityTask() {
-        const status = localStorage.getItem('cityTaskStatus');
+        document.getElementById('cityTaskModal').style.display = 'flex';
+    }
 
-        const statusElement = document.getElementById('cityTaskStatus');
-        const taskButton = document.querySelector('#cityTaskModal .plant-confirm');
+    let selectedCityTask = null;
 
-        if (status === 'completed') {
-            statusElement.innerHTML = '✅ Задание уже выполнено!';
+    const cityTasks = {
 
-            taskButton.textContent = 'Задание выполнено 🌿';
-            taskButton.disabled = true;
-            taskButton.style.opacity = '0.6';
-            taskButton.style.cursor = 'default';
-        } else {
-            statusElement.innerHTML = '🎁 Награда: <b>100 🌿</b>';
+        tree: {
+            title: '🌳 Посади дерево',
+            text: `
+                <b>Что сделать:</b><br>
+                Посади дерево в указанном городском месте.<br><br>
 
-            taskButton.textContent = 'Выполнить задание 🌱';
-            taskButton.disabled = false;
-            taskButton.style.opacity = '1';
-            taskButton.style.cursor = 'pointer';
+                <b>📍 Где:</b><br>
+                В выбранной зоне на карте города.<br><br>
+
+                <b>🌱 Что посадить:</b><br>
+                Молодое дерево, подходящее для городской среды.<br><br>
+
+                <b>🧰 Что понадобится:</b><br>
+                Саженец, вода, лопата и место для посадки.<br><br>
+
+                <b>🎁 Награда:</b><br>
+                100 🌿 баллов
+            `,
+            reward: 100
+        },
+
+        bush: {
+            title: '🌿 Посади кустарник',
+            text: `
+                <b>Что сделать:</b><br>
+                Посади кустарник в указанной зоне.<br><br>
+
+                <b>📍 Где:</b><br>
+                Возле выбранной городской территории.<br><br>
+
+                <b>🌿 Что посадить:</b><br>
+                Подходящий для местного климата кустарник.<br><br>
+
+                <b>🧰 Что понадобится:</b><br>
+                Саженец, вода и садовый инвентарь.<br><br>
+
+                <b>🎁 Награда:</b><br>
+                70 🌿 баллов
+            `,
+            reward: 70
+        },
+
+        flowers: {
+            title: '🌷 Укрась клумбу',
+            text: `
+                <b>Что сделать:</b><br>
+                Высади цветы на выбранной городской клумбе.<br><br>
+
+                <b>📍 Где:</b><br>
+                На отмеченной клумбе на карте.<br><br>
+
+                <b>🌷 Что посадить:</b><br>
+                Цветы, подходящие для городской среды.<br><br>
+
+                <b>🧰 Что понадобится:</b><br>
+                Цветы, вода, грунт и садовый инвентарь.<br><br>
+
+                <b>🎁 Награда:</b><br>
+                50 🌿 баллов
+            `,
+            reward: 50
         }
 
-        document.getElementById('cityTaskModal').style.display = 'flex';
+    };
+
+    function showCityTaskDetails(taskId) {
+
+        selectedCityTask = cityTasks[taskId];
+
+        if (!selectedCityTask) {
+            return;
+        }
+
+        document.getElementById('cityTaskDetailsTitle').textContent =
+            selectedCityTask.title;
+
+        document.getElementById('cityTaskDetailsText').innerHTML =
+            selectedCityTask.text;
+
+        document.getElementById('cityTaskDetailsModal').style.display = 'flex';
+    }
+
+    function closeCityTaskDetails() {
+
+        document.getElementById('cityTaskDetailsModal').style.display = 'none';
+
+    }
+
+    function startSelectedCityTask() {
+
+        if (!selectedCityTask) {
+            return;
+        }
+
+        closeCityTaskDetails();
+
+        document.getElementById('taskProofModal').style.display = 'flex';
+
     }
 
     function closeCityTask() {
@@ -3383,7 +3551,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
                 await loadSupportMessages();
 
-            }, 10000);
+            }, 1000);
         }
     }
 
