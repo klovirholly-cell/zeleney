@@ -3106,6 +3106,7 @@ async function submitTaskProof() {
             .select('id, title, reward_points')
             .eq('id', selectedCityTask.id)
             .maybeSingle();
+            if (button) button.textContent = 'Задание найдено...';
 
         if (taskError || !task) {
             throw new Error('Не удалось найти задание в базе данных.');
@@ -3120,6 +3121,7 @@ async function submitTaskProof() {
                 .eq('task_id', task.id)
                 .in('status', ['pending', 'approved'])
                 .limit(1);
+                if (button) button.textContent = 'Проверка пройдена...';
 
         if (checkError) {
             throw checkError;
@@ -3144,11 +3146,15 @@ async function submitTaskProof() {
             reader.onerror = () => reject(reader.error);
             reader.readAsDataURL(file);
         });
+
+        if (button) button.textContent = 'Фото подготовлено...';
+
         console.log('ШАГ 1: задание найдено', task);
         console.log('ШАГ 2: проверка повторной заявки пройдена');
         console.log('ШАГ 3: фотография подготовлена');
         console.log('ШАГ 4: начинаем сохранение заявки');
         // Сохраняем заявку
+        if (button) button.textContent = 'Сохраняем в базу...';
         const { error: submissionError } = await supabaseClient
             .from('task_submissions')
             .insert({
