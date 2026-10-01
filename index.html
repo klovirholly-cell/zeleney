@@ -1238,7 +1238,16 @@
         <!-- ОКНО ЗАДАНИЙ ГОРОДА -->
         <div id="cityTaskModal" class="plant-modal">
 
-            <div class="plant-modal-card">
+            <div
+                id="cityTaskModal"
+                class="plant-modal"
+                style="
+                    overflow-y: auto;
+                    align-items: flex-start;
+                    padding: 20px 10px;
+                    box-sizing: border-box;
+                "
+            >
 
                 <button class="plant-close" onclick="closeCityTask()">×</button>
 
@@ -1324,6 +1333,11 @@
         <div id="cityTaskDetailsModal" class="plant-modal">
 
             <div class="plant-modal-card">
+                style="
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    margin: 20px auto;
+                "
 
                 <button
                     class="plant-close"
@@ -5278,12 +5292,7 @@ function closeHistoryDetails() {
             markerElement.onclick = function() {
 
                 // Сначала показываем окно заданий
-                document.getElementById('cityTaskModal').style.display = 'flex';
-
-                // Затем сразу открываем нужное задание
-                setTimeout(() => {
-                    showCityTaskDetails(taskId);
-                }, 100);
+                showCityTaskDetails(taskId);
 
             };
 
