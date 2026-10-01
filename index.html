@@ -1382,7 +1382,16 @@
 
         <!-- ОКНО ПОДТВЕРЖДЕНИЯ ЗАДАНИЯ -->
 <div id="taskProofModal" class="plant-modal">
-    <div class="plant-modal-card">
+    <div
+        class="plant-modal-card"
+        style="
+            max-height: 85vh;
+            max-height: 85dvh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            box-sizing: border-box;
+        "
+    >
 
         <button class="plant-close" onclick="closeTaskProof()">×</button>
 
@@ -1411,7 +1420,12 @@
             Фото ещё не выбрано 📷
         </div>
 
-        <button class="plant-confirm" onclick="submitTaskProof()">
+        <button
+            type="button"
+            class="plant-confirm"
+            onclick="submitTaskProof()"
+            style="touch-action: manipulation; flex-shrink: 0;"
+        >
             Отправить на проверку 🌿
         </button>
 
