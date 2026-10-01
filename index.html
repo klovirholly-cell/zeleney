@@ -3009,129 +3009,133 @@ window.addEventListener('DOMContentLoaded', loadUser);
             `;
         }
     }
-    async function submitTaskProof() {
-        const input = document.getElementById('taskPhotoInput');
+    
+async function submitTaskProof() {
+    const input = document.getElementById('taskPhotoInput');
+    const descriptionInput = document.getElementById('taskProofDescription');
 
-        if (!input || input.files.length === 0) {
-            alert('Сначала добавь фотографию 🌱');
+    if (!selectedCityTask) {
+        alert('Сначала выбери городское задание 🌱');
+        return;
+    }
+
+    if (!input || input.files.length === 0) {
+        alert('Сначала добавь фотографию 🌱');
+        return;
+    }
+
+    if (!descriptionInput || !descriptionInput.value.trim()) {
+        alert('Напиши небольшое описание выполненной работы 📝');
+        return;
+    }
+
+    const userId = localStorage.getItem('userName') || 'Гость';
+    const file = input.files[0];
+    const description = descriptionInput.value.trim();
+
+    if (userId === 'Гость') {
+        alert('Сначала зарегистрируйся 🌱');
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        alert('Фотография должна быть размером до 10 МБ 📷');
+        return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+        alert('Можно загрузить только фотографию 📷');
+        return;
+    }
+
+    try {
+        // Находим задание в базе по его названию
+        const { data: tasks, error: taskError } = await supabaseClient
+            .from('tasks')
+            .select('id, title, reward_points')
+            .eq('title', selectedCityTask.title)
+            .limit(1);
+
+        if (taskError) {
+            throw taskError;
+        }
+
+        if (!tasks || tasks.length === 0) {
+            alert('Не удалось найти выбранное задание в базе.');
             return;
         }
 
-        const userId = localStorage.getItem('userName') || 'Гость';
-        const file = input.files[0];
+        const task = tasks[0];
 
-        const description = document
-            .getElementById('taskProofDescription')
-            .value
-            .trim();
-
-        if (!description) {
-            alert('Напиши небольшое описание выполненной работы 📝');
-            return;
-        }
-
-        // Проверяем размер
-        if (file.size > 10 * 1024 * 1024) {
-            alert(
-                'Фотография слишком большая 📷\n\n' +
-                'Выбери изображение размером до 10 МБ.'
-            );
-            return;
-        }
-
-        // Проверяем тип файла
-        if (!file.type.startsWith('image/')) {
-            alert('Можно загрузить только фотографию 📷');
-            return;
-        }
-
-        // Проверяем, нет ли уже заявки
+        // Проверяем заявки только на это конкретное задание
         const { data: existingSubmission, error: checkError } =
             await supabaseClient
                 .from('task_submissions')
                 .select('id, status')
                 .eq('user_id', userId)
+                .eq('task_id', task.id)
                 .in('status', ['pending', 'approved'])
                 .limit(1);
 
         if (checkError) {
-            console.error('Ошибка проверки:', checkError);
-            alert('Не удалось проверить заявку. Попробуй ещё раз.');
-            return;
+            throw checkError;
         }
 
         if (existingSubmission && existingSubmission.length > 0) {
-            const status = existingSubmission[0].status;
-
-            if (status === 'pending') {
-                alert('У тебя уже есть задание, ожидающее проверки 🌿');
-            } else if (status === 'approved') {
-                alert('Это задание уже подтверждено и баллы были начислены 🌱');
+            if (existingSubmission[0].status === 'pending') {
+                alert('Твоё задание уже ожидает проверки 🌿');
+            } else {
+                alert('Это задание уже подтверждено 🌱');
             }
-
             return;
         }
 
-        // Получаем задание
-        const { data: tasks, error: taskError } =
-            await supabaseClient
-                .from('tasks')
-                .select('id, title, reward_points')
-                .limit(1);
-
-        const task = tasks && tasks.length > 0 ? tasks[0] : null;
-
-        if (taskError || !task) {
-            console.error('Ошибка поиска задания:', taskError);
-            alert('Не удалось найти задание в базе.');
-            return;
-        }
-
-        // Превращаем фотографию в изображение для сохранения
+        // Преобразуем фотографию
         const imageData = await new Promise((resolve, reject) => {
-
             const reader = new FileReader();
-
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => reject(reader.error);
-
             reader.readAsDataURL(file);
         });
 
-        // Отправляем заявку вместе с фотографией
-        const { error: submissionError } =
-            await supabaseClient
-                .from('task_submissions')
-                .insert({
-                    task_id: task.id,
-                    user_id: userId,
-                    proof_text: `Фото: ${file.name}\nОписание: ${description}`,
-                    proof_image_url: imageData,
-                    status: 'pending'
-                });
+        // Отправляем заявку
+        const { error: submissionError } = await supabaseClient
+            .from('task_submissions')
+            .insert({
+                task_id: task.id,
+                user_id: userId,
+                proof_text: `Фото: ${file.name}\nОписание: ${description}`,
+                proof_image_url: imageData,
+                status: 'pending'
+            });
 
         if (submissionError) {
-            console.error(
-                'Ошибка отправки:',
-                submissionError
-            );
-
-            alert(
-                'Не удалось отправить задание на проверку.\n\n' +
-                submissionError.message
-            );
-
-            return;
+            throw submissionError;
         }
 
         closeTaskProof();
+
+        input.value = '';
+        descriptionInput.value = '';
+
+        document.getElementById('taskPhotoPreview').innerHTML =
+            'Фото ещё не выбрано 📷';
 
         alert(
             'Задание отправлено на проверку! 🌱\n\n' +
             'Фото прикреплено к заявке 📷\n' +
             'Баллы будут начислены после подтверждения.'
         );
+
+    } catch (error) {
+        console.error('Ошибка отправки задания:', error);
+
+        alert(
+            'Не удалось отправить задание на проверку.\n\n' +
+            error.message
+        );
     }
+}
     async function checkApprovedTasks() {
         console.log('ПРОВЕРКА ЗАДАНИЯ ЗАПУЩЕНА');
 
