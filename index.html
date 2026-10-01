@@ -1445,7 +1445,7 @@
         <button
             type="button"
             class="plant-confirm"
-            onclick="alert('Кнопка нажалась!'); submitTaskProof();"
+            onclick="submitTaskProof()"
             style="
                 touch-action: manipulation;
                 pointer-events: auto;
@@ -2926,6 +2926,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
     const cityTasks = {
 
         garden: {
+            id: 4,
             title: '🌳 Городской сад',
             text: `
                 <b>📍 Место:</b><br>
@@ -2947,6 +2948,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
         },
 
         alley: {
+            id: 2,
             title: '🌿 Кипарисовая аллея',
             text: `
                 <b>📍 Место:</b><br>
@@ -2968,6 +2970,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
         },
 
         embankment: {
+            id: 3,
             title: '🌷 Центральная набережная',
             text: `
                 <b>📍 Место:</b><br>
@@ -3090,10 +3093,7 @@ async function submitTaskProof() {
         return;
     }
 
-    // Получаем настоящее задание из базы данных
-    const taskTitle = selectedCityTask.title
-        .replace(/^[^А-Яа-яЁёA-Za-z0-9]+/, '')
-        .trim();
+    
 
     if (button) {
         button.disabled = true;
@@ -3104,7 +3104,7 @@ async function submitTaskProof() {
         const { data: task, error: taskError } = await supabaseClient
             .from('tasks')
             .select('id, title, reward_points')
-            .eq('title', taskTitle)
+            .eq('id', selectedCityTask.id)
             .maybeSingle();
 
         if (taskError || !task) {
