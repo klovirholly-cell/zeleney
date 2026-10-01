@@ -3144,7 +3144,10 @@ async function submitTaskProof() {
             reader.onerror = () => reject(reader.error);
             reader.readAsDataURL(file);
         });
-
+        console.log('ШАГ 1: задание найдено', task);
+        console.log('ШАГ 2: проверка повторной заявки пройдена');
+        console.log('ШАГ 3: фотография подготовлена');
+        console.log('ШАГ 4: начинаем сохранение заявки');
         // Сохраняем заявку
         const { error: submissionError } = await supabaseClient
             .from('task_submissions')
@@ -3159,6 +3162,7 @@ async function submitTaskProof() {
         if (submissionError) {
             throw submissionError;
         }
+        console.log('ШАГ 5: заявка успешно сохранена');
 
         closeTaskProof();
 
