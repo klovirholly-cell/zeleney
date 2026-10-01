@@ -5227,6 +5227,7 @@ function closeHistoryDetails() {
     </script>
     <script>
     async function initYandexMap() {
+
         await ymaps3.ready;
 
         const {
@@ -5236,112 +5237,102 @@ function closeHistoryDetails() {
             YMapMarker
         } = ymaps3;
 
-        const mapContainer = document.getElementById('yandexMap');
-
-        if (!mapContainer) {
-            console.log('Контейнер карты не найден');
-            return;
-        }
-
-        if (window.ecoMap) {
-            window.ecoMap.destroy();
-        }
-
-        window.ecoMap = new YMap(
-            mapContainer,
+        const map = new YMap(
+            document.getElementById('yandexMap'),
             {
                 location: {
-                        center: [34.9742, 44.8500],
-                    zoom: 12
+                    center: [34.9711, 44.8488],
+                    zoom: 14
                 }
             }
         );
 
-        window.ecoMap.addChild(
-            new YMapDefaultSchemeLayer()
-        );
+        map.addChild(new YMapDefaultSchemeLayer());
+        map.addChild(new YMapDefaultFeaturesLayer());
 
-        window.ecoMap.addChild(
-            new YMapDefaultFeaturesLayer()
-        );
-        const points = [
-            {
-                title: '🌳 Сквер — посадка деревьев',
-                text: 'Здесь можно помочь озеленению Судака.',
-                action: 'Посади дерево и добавь его в свой экологический прогресс.',
-                coordinates: [34.9742, 44.8500]
-            },
-            {
-                title: '🌱 Зона озеленения',
-                text: 'Место, где можно посадить растение и сделать город зеленее.',
-                action: 'Добавь растение в свой экологический прогресс.',
-                coordinates: [34.9800, 44.8480]
-            },
-            {
-                title: '💚 Экологическая акция',
-                text: 'Здесь проходят экологические мероприятия.',
-                action: 'Прими участие в экологической акции.',
-                coordinates: [34.9680, 44.8530]
-            }
-        ];
+        // =========================
+        // ФУНКЦИЯ СОЗДАНИЯ ТОЧКИ
+        // =========================
 
-        points.forEach(point => {
+        function createTaskMarker(
+            emoji,
+            coordinates,
+            taskId,
+            title
+        ) {
 
             const markerElement = document.createElement('div');
-            markerElement.dataset.pointTitle = point.title;
-            const completedPoints =
-                JSON.parse(localStorage.getItem('completedPoints')) || [];
 
-            const isCompleted = completedPoints.includes(point.title);
+            markerElement.textContent = emoji;
 
-            const markerIcon = isCompleted ? '✅' : '🌱';
+            markerElement.style.fontSize = '38px';
+            markerElement.style.width = '50px';
+            markerElement.style.height = '50px';
+            markerElement.style.display = 'flex';
+            markerElement.style.alignItems = 'center';
+            markerElement.style.justifyContent = 'center';
+            markerElement.style.cursor = 'pointer';
 
-            const markerContent = document.createElement('div');
+            markerElement.title = title;
 
-            markerContent.style.width = '46px';
-            markerContent.style.height = '46px';
-            markerContent.style.background = 'white';
-            markerContent.style.border = '3px solid #5d9b58';
-            markerContent.style.borderRadius = '50%';
-            markerContent.style.display = 'flex';
-            markerContent.style.alignItems = 'center';
-            markerContent.style.justifyContent = 'center';
-            markerContent.style.fontSize = '28px';
-            markerContent.style.cursor = 'pointer';
-            markerContent.style.boxShadow = '0 3px 10px rgba(0,0,0,0.25)';
+            markerElement.onclick = function() {
 
-            markerContent.textContent = markerIcon;
+                // Сначала показываем окно заданий
+                document.getElementById('cityTaskModal').style.display = 'flex';
 
-            markerElement.appendChild(markerContent);
+                // Затем сразу открываем нужное задание
+                setTimeout(() => {
+                    showCityTaskDetails(taskId);
+                }, 100);
 
-           markerElement.onclick = () => {
-
-                window.selectedMarkerContent = markerContent;
-
-                document.getElementById('pointMessage').textContent =
-                    point.title + '\n\n' +
-                    point.text + '\n\n' +
-                    'Что можно сделать: ' +
-                    point.action;
-
-                document.getElementById('pointCard').style.display = 'block';
-
-                document.getElementById('pointCard').dataset.pointName = point.title;
             };
 
-            const marker = new ymaps3.YMapMarker(
+            const marker = new YMapMarker(
                 {
-                    coordinates: point.coordinates,
-                    zIndex: 1000
+                    coordinates: coordinates
                 },
                 markerElement
             );
 
-            window.ecoMap.addChild(marker);
-            markerElement.dataset.marker = 'true';
-        });
+            map.addChild(marker);
+        }
 
-        console.log('Яндекс Карта загружена 🌿');
+
+        // =========================
+        // 1. ГОРОДСКОЙ САД
+        // =========================
+
+        createTaskMarker(
+            '🌳',
+            [34.9724, 44.8501],
+            'garden',
+            'Городской сад'
+        );
+
+
+        // =========================
+        // 2. КИПАРИСОВАЯ АЛЛЕЯ
+        // =========================
+
+        createTaskMarker(
+            '🌿',
+            [34.9698, 44.8509],
+            'alley',
+            'Кипарисовая аллея'
+        );
+
+
+        // =========================
+        // 3. ЦЕНТРАЛЬНАЯ НАБЕРЕЖНАЯ
+        // =========================
+
+        createTaskMarker(
+            '🌷',
+            [34.9678, 44.8458],
+            'embankment',
+            'Центральная набережная'
+        );
+
     }
     function updateAdminButton() {
         const adminButton = document.getElementById('adminButton');
