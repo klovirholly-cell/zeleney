@@ -1398,6 +1398,12 @@
             accept="image/*"
             onchange="showTaskPhoto(this)"
         >
+        <textarea
+            id="taskProofDescription"
+            placeholder="Опиши, что ты сделала 🌱"
+            rows="4"
+            style="width: 100%; box-sizing: border-box; margin-top: 12px; padding: 12px; border: 1px solid #d8ead4; border-radius: 12px; resize: vertical; font-family: inherit;"
+        ></textarea>
 
         <div id="taskPhotoPreview" style="margin: 15px 0; text-align: center; color: #5d9b58;">
             Фото ещё не выбрано 📷
@@ -3012,6 +3018,16 @@ window.addEventListener('DOMContentLoaded', loadUser);
         const userId = localStorage.getItem('userName') || 'Гость';
         const file = input.files[0];
 
+        const description = document
+            .getElementById('taskProofDescription')
+            .value
+            .trim();
+
+        if (!description) {
+            alert('Напиши небольшое описание выполненной работы 📝');
+            return;
+        }
+
         // Проверяем размер
         if (file.size > 10 * 1024 * 1024) {
             alert(
@@ -3087,7 +3103,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
                 .insert({
                     task_id: task.id,
                     user_id: userId,
-                    proof_text: `Фото-доказательство: ${file.name}`,
+                    proof_text: `Фото: ${file.name}\nОписание: ${description}`,
                     proof_image_url: imageData,
                     status: 'pending'
                 });
