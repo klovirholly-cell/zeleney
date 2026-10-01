@@ -1236,98 +1236,107 @@
     <div class="app">
 
         <!-- ОКНО ЗАДАНИЙ ГОРОДА -->
-        <div id="cityTaskModal" class="plant-modal">
+        <!-- ОКНО ЗАДАНИЙ ГОРОДА -->
+<div id="cityTaskModal" class="plant-modal">
 
-            <div
-                id="cityTaskModal"
-                class="plant-modal"
-                style="
-                    overflow-y: auto;
-                    align-items: flex-start;
-                    padding: 20px 10px;
-                    box-sizing: border-box;
-                "
-            >
+    <div
+        class="plant-modal-card"
+        style="
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 20px auto;
+            box-sizing: border-box;
+        "
+    >
 
-                <button class="plant-close" onclick="closeCityTask()">×</button>
+        <button
+            class="plant-close"
+            onclick="closeCityTask()"
+            type="button"
+        >
+            ×
+        </button>
 
-                <div class="plant-modal-icon">🎯</div>
+        <div class="plant-modal-icon">🎯</div>
 
-                <h2>Задания города</h2>
+        <h2>Задания города</h2>
 
-                <p>
-                    Выбери задание и помоги сделать город зеленее 🌱
-                </p>
+        <p>
+            Выбери задание и помоги сделать город зеленее 🌱
+        </p>
 
-                <!-- ЗАДАНИЕ 1 -->
-                <div class="city-task-card">
 
-                    <h3>🌳 Посади дерево</h3>
+        <!-- ЗАДАНИЕ 1 -->
+        <div class="city-task-card">
 
-                    <p>
-                        Посади дерево в выбранном месте и подтверди выполнение фотографией.
-                    </p>
+            <h3>🌳 Городской сад</h3>
 
-                    <div class="task-reward">
-                        🎁 Награда: <b>100 🌿</b>
-                    </div>
+            <p>
+                📍 г. Судак, ул. Ленина — городской сад
+            </p>
 
-                    <button
-                        class="plant-confirm"
-                        onclick="showCityTaskDetails('garden')"
-                    >
-                        Подробнее
-                    </button>
-
-                </div>
-
-                <!-- ЗАДАНИЕ 2 -->
-                <div class="city-task-card">
-
-                    <h3>🌿 Посади кустарник</h3>
-
-                    <p>
-                        Посади кустарник возле указанной городской зоны.
-                    </p>
-
-                    <div class="task-reward">
-                        🎁 Награда: <b>70 🌿</b>
-                    </div>
-
-                    <button
-                        class="plant-confirm"
-                        onclick="showCityTaskDetails('alley')"
-                    >
-                        Подробнее
-                    </button>
-
-                </div>
-
-                <!-- ЗАДАНИЕ 3 -->
-                <div class="city-task-card">
-
-                    <h3>🌷 Укрась клумбу</h3>
-
-                    <p>
-                        Высади цветы на выбранной клумбе и отправь фотографию результата.
-                    </p>
-
-                    <div class="task-reward">
-                        🎁 Награда: <b>50 🌿</b>
-                    </div>
-
-                    <button
-                        class="plant-confirm"
-                        onclick="showCityTaskDetails('embankment')"
-                    >
-                        Подробнее
-                    </button>
-
-                </div>
-
+            <div class="task-reward">
+                🎁 Награда: <b>100 🌿</b>
             </div>
 
+            <button
+                class="plant-confirm"
+                onclick="showCityTaskDetails('garden')"
+            >
+                Подробнее
+            </button>
+
         </div>
+
+
+        <!-- ЗАДАНИЕ 2 -->
+        <div class="city-task-card">
+
+            <h3>🌿 Кипарисовая аллея</h3>
+
+            <p>
+                📍 г. Судак, Кипарисовая аллея
+            </p>
+
+            <div class="task-reward">
+                🎁 Награда: <b>80 🌿</b>
+            </div>
+
+            <button
+                class="plant-confirm"
+                onclick="showCityTaskDetails('alley')"
+            >
+                Подробнее
+            </button>
+
+        </div>
+
+
+        <!-- ЗАДАНИЕ 3 -->
+        <div class="city-task-card">
+
+            <h3>🌷 Центральная набережная</h3>
+
+            <p>
+                📍 г. Судак, центральная часть набережной
+            </p>
+
+            <div class="task-reward">
+                🎁 Награда: <b>70 🌿</b>
+            </div>
+
+            <button
+                class="plant-confirm"
+                onclick="showCityTaskDetails('embankment')"
+            >
+                Подробнее
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
         <!-- ПОДРОБНОСТИ ЗАДАНИЯ -->
         <div id="cityTaskDetailsModal" class="plant-modal">
@@ -2951,7 +2960,7 @@ window.addEventListener('DOMContentLoaded', loadUser);
 
         document.getElementById('cityTaskDetailsModal').style.display = 'none';
 
-        showScreen('map');
+        document.getElementById('cityTaskModal').style.display = 'none';
 
     }
 
