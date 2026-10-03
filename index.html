@@ -64,6 +64,34 @@
         color: white;
         font-size: 16px;
     }
+
+    .registration-card .auth-secondary-button {
+        margin-top: 10px;
+        background: #edf6e9;
+        color: #315f3b;
+    }
+    .registration-card .auth-link-button {
+        margin-top: 8px;
+        padding: 8px;
+        background: transparent;
+        color: #315f3b;
+        font-size: 14px;
+    }
+    .registration-card .auth-message {
+        min-height: 20px;
+        margin: 12px 0 0;
+        font-size: 14px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+    .registration-card button:disabled { opacity: .65; cursor: wait; }
+    @media (max-width: 420px) {
+        .registration-card {
+            width: calc(100% - 32px);
+            max-height: calc(100dvh - 32px);
+            overflow-y: auto;
+        }
+    }
     * {
         box-sizing: border-box;
         margin: 0;
@@ -1217,26 +1245,18 @@
     <div id="registrationScreen" class="registration-screen">
         <div class="registration-card">
             <div class="registration-logo">🌱</div>
-    
-            <h1>Добро пожаловать!</h1>
-    
-            <p>Давай познакомимся 💚</p>
-    
-            <input
-                type="text"
-                id="nameInput"
-                placeholder="Введи своё имя"
-            >
-
-            <input
-                type="password"
-                id="developerCodeInput"
-                placeholder="Код разработчика (необязательно)"
-            >
-    
-            <button onclick="registerUser()">
-                Продолжить
-            </button>
+            <h1 id="authTitle">Добро пожаловать!</h1>
+            <p id="authSubtitle">Создай аккаунт ЭкоГрада 💚</p>
+            <div id="authNameWrap">
+                <input type="text" id="nameInput" placeholder="Твоё имя" autocomplete="name">
+            </div>
+            <input type="email" id="emailInput" placeholder="Электронная почта" autocomplete="email">
+            <input type="password" id="passwordInput" placeholder="Пароль (не менее 8 символов)" autocomplete="new-password">
+            <input type="password" id="confirmPasswordInput" placeholder="Повтори пароль" autocomplete="new-password">
+            <button id="authSubmitButton" type="button" onclick="registerUser()">Зарегистрироваться</button>
+            <button id="authModeButton" class="auth-secondary-button" type="button" onclick="toggleAuthMode()">Уже есть аккаунт? Войти</button>
+            <button id="forgotPasswordButton" class="auth-link-button" type="button" onclick="resetPassword()" style="display:none;">Забыли пароль?</button>
+            <p id="authMessage" class="auth-message" role="status" aria-live="polite"></p>
         </div>
     </div>
     <div id="settingsScreen" class="screen" style="display: none;">
@@ -1248,6 +1268,10 @@
 
         <div class="card" onclick="resetData()">
             🔄 Сбросить данные
+        </div>
+
+        <div class="card" onclick="logoutUser()">
+            🚪 Выйти из аккаунта
         </div>
 
         <button onclick="closeSettings()">
@@ -2472,58 +2496,184 @@
         console.log('Проверка Supabase:', data, error);
     })();
     
-    function registerUser() {
-        const name = document.querySelector('#registrationScreen input[type="text"]').value.trim();
-        alert('Сайт считал имя: [' + name + ']');
-        const developerCode = document.getElementById('developerCodeInput').value.trim();
+    let authMode = 'signup';
+    let currentAuthUser = null;
 
-        if (name === '') {
-            alert('Пожалуйста, введи своё имя 🌱');
+    function setAuthMessage(message, isError = false) {
+        const el = document.getElementById('authMessage');
+        if (!el) return;
+        el.textContent = message || '';
+        el.style.color = isError ? '#b3261e' : '#315f3b';
+    }
+
+    function setAuthLoading(isLoading) {
+        const button = document.getElementById('authSubmitButton');
+        if (!button) return;
+        button.disabled = isLoading;
+        button.textContent = isLoading ? 'Подожди...' :
+            (authMode === 'signup' ? 'Зарегистрироваться' : 'Войти');
+    }
+
+    function setAuthMode(mode) {
+        authMode = mode;
+        const isSignup = mode === 'signup';
+        document.getElementById('authTitle').textContent = isSignup ? 'Создать аккаунт' : 'С возвращением!';
+        document.getElementById('authSubtitle').textContent = isSignup ? 'Присоединяйся к ЭкоГраду 💚' : 'Войди в свой аккаунт 🌿';
+        document.getElementById('authNameWrap').style.display = isSignup ? 'block' : 'none';
+        document.getElementById('confirmPasswordInput').style.display = isSignup ? 'block' : 'none';
+        document.getElementById('authSubmitButton').textContent = isSignup ? 'Зарегистрироваться' : 'Войти';
+        document.getElementById('authModeButton').textContent = isSignup ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться';
+        document.getElementById('forgotPasswordButton').style.display = isSignup ? 'none' : 'block';
+        setAuthMessage('');
+    }
+
+    function toggleAuthMode() {
+        setAuthMode(authMode === 'signup' ? 'login' : 'signup');
+    }
+
+    async function registerUser() {
+        if (authMode === 'login') return loginUser();
+
+        const name = document.getElementById('nameInput').value.trim();
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value;
+        const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+        if (!name || !email || !password || !confirmPassword) {
+            setAuthMessage('Заполни все поля 🌱', true); return;
+        }
+        if (password.length < 8) {
+            setAuthMessage('Пароль должен содержать не менее 8 символов.', true); return;
+        }
+        if (password !== confirmPassword) {
+            setAuthMessage('Пароли не совпадают. Проверь их ещё раз.', true); return;
+        }
+
+        setAuthLoading(true);
+        setAuthMessage('Создаём аккаунт...');
+        try {
+            const { data, error } = await supabaseClient.auth.signUp({
+                email, password,
+                options: {
+                    data: { display_name: name },
+                    emailRedirectTo: 'https://klovirholly-cell.github.io/zeleney/'
+                }
+            });
+            if (error) throw error;
+
+            if (data.session && data.user) {
+                await finishLogin(data.user);
+            } else {
+                setAuthMessage('Аккаунт создан! Проверь почту и нажми на ссылку подтверждения. После этого вернись в ЭкоГрад и войди в аккаунт.');
+            }
+        } catch (error) {
+            console.error('Ошибка регистрации:', error);
+            setAuthMessage(error.message || 'Не удалось создать аккаунт. Попробуй ещё раз.', true);
+        } finally {
+            setAuthLoading(false);
+        }
+    }
+
+    async function loginUser() {
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value;
+        if (!email || !password) {
+            setAuthMessage('Введи почту и пароль.', true); return;
+        }
+
+        setAuthLoading(true);
+        setAuthMessage('Входим в аккаунт...');
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            await finishLogin(data.user);
+        } catch (error) {
+            console.error('Ошибка входа:', error);
+            setAuthMessage(error.message || 'Не удалось войти. Проверь почту и пароль.', true);
+        } finally {
+            setAuthLoading(false);
+        }
+    }
+
+    async function resetPassword() {
+        const email = document.getElementById('emailInput').value.trim();
+        if (!email) {
+            setAuthMessage('Сначала введи электронную почту.', true); return;
+        }
+        try {
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: 'https://klovirholly-cell.github.io/zeleney/'
+            });
+            if (error) throw error;
+            setAuthMessage('Если для этой почты есть аккаунт, письмо для восстановления пароля скоро придёт.');
+        } catch (error) {
+            setAuthMessage(error.message || 'Не удалось отправить письмо.', true);
+        }
+    }
+
+    async function finishLogin(user) {
+        if (!user) return;
+        currentAuthUser = user;
+
+        const { data: profile, error } = await supabaseClient
+            .from('profiles').select('display_name, role').eq('id', user.id).maybeSingle();
+
+        if (error) {
+            console.error('Ошибка загрузки профиля:', error);
+            setAuthMessage('Аккаунт найден, но профиль пока не загрузился. Обнови страницу или попробуй позже.', true);
             return;
         }
 
-        // Проверяем код разработчика
-        if (developerCode === 'ECO2026') {
-            localStorage.setItem('isAdmin', 'true');
-        } else {
-            localStorage.setItem('isAdmin', 'false');
-        }
+        const displayName = (profile && profile.display_name) ||
+            (user.user_metadata && user.user_metadata.display_name) ||
+            (user.email ? user.email.split('@')[0] : 'Участник ЭкоГрада');
 
-        localStorage.setItem('userName', name);
-
-        localStorage.setItem('plantCount', '0');
-        localStorage.setItem('pointCount', '0');
-        localStorage.setItem('photoCount', '0');
-        localStorage.removeItem('history');
-        localStorage.removeItem('savedPhoto');
-
-        document.getElementById('plantCount').textContent = '0';
-        document.getElementById('profilePlantCount').textContent = '0';
-        document.getElementById('pointCount').textContent = '0';
-        document.getElementById('photoCount').textContent = '0';
-
-        document.getElementById('profileUserName').textContent = name;
-
+        localStorage.setItem('userName', displayName);
+        localStorage.setItem('isAdmin', profile && profile.role === 'admin' ? 'true' : 'false');
+        document.getElementById('profileUserName').textContent = displayName;
         document.getElementById('registrationScreen').style.display = 'none';
-
         updateAdminButton();
 
-        alert('Добро пожаловать, ' + name + '! 💚');
-    }
-    function loadUser() {
-        const savedName = localStorage.getItem('userName');
         const savedRewardPoints = localStorage.getItem('rewardPoints') || '0';
-        document.querySelectorAll('#rewardPoints').forEach(element => {
-            element.textContent = savedRewardPoints;
-        });
+        document.querySelectorAll('#rewardPoints').forEach(el => { el.textContent = savedRewardPoints; });
+    }
 
-        if (savedName) {
-            document.getElementById('profileUserName').textContent = savedName;
-            document.getElementById('registrationScreen').style.display = 'none';
+    async function loadUser() {
+        const savedRewardPoints = localStorage.getItem('rewardPoints') || '0';
+        document.querySelectorAll('#rewardPoints').forEach(el => { el.textContent = savedRewardPoints; });
+
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) console.error('Ошибка проверки сессии:', error);
+
+        if (data && data.session && data.session.user) {
+            await finishLogin(data.session.user);
+        } else {
+            document.getElementById('nameInput').value = localStorage.getItem('userName') || '';
+            document.getElementById('registrationScreen').style.display = 'flex';
+            setAuthMode('signup');
+            updateAdminButton();
         }
     }
 
-window.addEventListener('DOMContentLoaded', loadUser);
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session && session.user) {
+            setTimeout(() => finishLogin(session.user), 0);
+        } else if (event === 'SIGNED_OUT') {
+            currentAuthUser = null;
+            localStorage.setItem('isAdmin', 'false');
+            document.getElementById('registrationScreen').style.display = 'flex';
+            setAuthMode('login');
+            updateAdminButton();
+        }
+    });
+
+    async function logoutUser() {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) alert('Не удалось выйти из аккаунта: ' + error.message);
+    }
+
+    window.addEventListener('DOMContentLoaded', loadUser);
+
     async function exchangePrize(prizeName, price) {
         const userName = localStorage.getItem('userName');
 
@@ -2913,7 +3063,6 @@ window.addEventListener('DOMContentLoaded', loadUser);
         // Показываем регистрацию заново
         document.getElementById('registrationScreen').style.display = 'flex';
         document.getElementById('nameInput').value = '';
-        document.getElementById('developerCodeInput').value = '';
         document.getElementById('profileUserName').textContent = 'Пользователь';
 
         alert('Все данные сброшены 💚');
@@ -3079,6 +3228,26 @@ async function submitTaskProof() {
     const description = descriptionInput.value.trim();
     const userId = localStorage.getItem('userName') || 'Гость';
 
+    const { data: authData, error: authError } =
+        await supabaseClient.auth.getUser();
+
+    if (authError || !authData.user) {
+        alert('Сначала войди в свой аккаунт ЭкоГрада 🌱');
+        return;
+    }
+
+    const authUserId = authData.user.id;
+
+    const { data: authData, error: authError } =
+        await supabaseClient.auth.getUser();
+
+    if (authError || !authData.user) {
+        alert('Сначала войди в свой аккаунт ЭкоГрада.');
+        return;
+    }
+
+    const authUserId = authData.user.id;
+
     if (!description) {
         alert('Напиши описание выполненной работы 📝');
         return;
@@ -3114,15 +3283,13 @@ async function submitTaskProof() {
         }
 
         // Проверяем заявку только на это задание
-        const { data: existingSubmission, error: checkError } =
-            await supabaseClient
-                .from('task_submissions')
-                .select('id, status')
-                .eq('user_id', userId)
-                .eq('task_id', task.id)
-                .in('status', ['pending', 'approved'])
-                .limit(1);
-                if (button) button.textContent = 'Проверка пройдена...';
+        .insert({
+            task_id: task.id,
+            user_id: userId,
+            auth_user_id: authUserId,
+            proof_text: `ТЕСТ БЕЗ ФОТО: ${description}`,
+            status: 'pending'
+        });
 
         if (checkError) {
             throw checkError;
@@ -3141,14 +3308,27 @@ async function submitTaskProof() {
         }
 
         // Подготавливаем фотографию
-        const imageData = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(file);
-        });
+        // Загружаем фотографию в закрытое хранилище Supabase
+        const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
 
-        if (button) button.textContent = 'Фото подготовлено...';
+        const photoPath =
+            `${authUserId}/${task.id}/${Date.now()}-${safeFileName}`;
+
+        if (button) button.textContent = 'Загружаем фотографию...';
+
+        const { data: uploadedPhoto, error: uploadError } =
+            await supabaseClient.storage
+                .from('task-proofs')
+                .upload(photoPath, file, {
+                    contentType: file.type,
+                    upsert: false
+                });
+
+        if (uploadError) throw uploadError;
+
+        const uploadedPhotoPath = uploadedPhoto.path;
+
+        if (button) button.textContent = 'Фото загружено...';
 
         console.log('ШАГ 1: задание найдено', task);
         console.log('ШАГ 2: проверка повторной заявки пройдена');
@@ -3161,7 +3341,9 @@ async function submitTaskProof() {
             .insert({
                 task_id: task.id,
                 user_id: userId,
-                proof_text: `ТЕСТ БЕЗ ФОТО: ${description}`,
+                auth_user_id: authUserId,
+                proof_text: description,
+                photo_url: uploadedPhotoPath,
                 status: 'pending'
             });
 
@@ -4540,14 +4722,23 @@ function closeHistoryDetails() {
     setTimeout(() => {
         checkApprovedTasks();
     }, 1000);
-    function openAdminPanel() {
-        const isAdmin = localStorage.getItem('isAdmin');
+    async function openAdminPanel() {
+        const { data: authData } = await supabaseClient.auth.getUser();
+        const user = authData && authData.user;
+        if (!user) {
+            alert('Сначала войди в аккаунт 🔒');
+            return;
+        }
 
-        if (isAdmin !== 'true') {
+        const { data: profile, error } = await supabaseClient
+            .from('profiles').select('role').eq('id', user.id).maybeSingle();
+
+        if (error || !profile || profile.role !== 'admin') {
             alert('Доступ запрещён 🔒');
             return;
         }
 
+        localStorage.setItem('isAdmin', 'true');
         showScreen('adminScreen');
         loadAdminSubmissions();
         loadRewardOrders();
@@ -4969,19 +5160,33 @@ function closeHistoryDetails() {
     async function loadAdminSubmissions() {
         const container = document.getElementById('adminSubmissions');
 
+        if (!container) return;
+
         container.innerHTML = `
             <p style="text-align:center;color:#777;padding:20px;">
                 Загрузка заявок...
             </p>
         `;
 
+        // Защита текста от некорректной вставки в HTML
+        const escapeHtml = (value) => {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[char]);
+        };
+
+        // Получаем заявки из Supabase
         const { data, error } = await supabaseClient
             .from('task_submissions')
             .select(`
                 id,
                 user_id,
                 proof_text,
-                proof_image_url,
+                photo_url,
                 status,
                 created_at,
                 tasks (
@@ -5004,7 +5209,7 @@ function closeHistoryDetails() {
                 ">
                     ❌ Не удалось загрузить заявки.
                     <br><br>
-                    Проверь подключение к Supabase.
+                    ${escapeHtml(error.message)}
                 </div>
             `;
 
@@ -5019,65 +5224,46 @@ function closeHistoryDetails() {
                     border-radius:20px;
                     text-align:center;
                     color:#777;
-                    box-shadow:0 4px 12px rgba(80,120,70,0.08);
                 ">
                     <div style="font-size:45px;">🌿</div>
-
-                    <h3 style="margin:10px 0;">
-                        Новых заявок пока нет
-                    </h3>
-
-                    <p>
-                        Когда пользователь отправит задание,
-                        оно появится здесь.
-                    </p>
+                    <h3>Новых заявок пока нет</h3>
+                    <p>Когда пользователь отправит задание,
+                    оно появится здесь.</p>
                 </div>
             `;
 
             return;
         }
 
-        container.innerHTML = data.map(submission => `
-            <div style="
-                background:white;
-                padding:20px;
-                border-radius:20px;
-                margin-bottom:15px;
-                box-shadow:0 3px 12px rgba(0,0,0,0.06);
-            ">
+        // Формируем карточки заявок и получаем временные ссылки на фото
+        const cards = await Promise.all(data.map(async submission => {
 
-                <h3 style="
-                    margin-top:0;
-                    color:#315f3b;
-                ">
-                    ${submission.tasks?.title || 'Задание'}
-                </h3>
-
-                <p>
-                    👤 Пользователь:
-                    <b>${submission.user_id}</b>
-                </p>
-
-                <p>
-                    🌿 Награда:
-                    <b>${submission.tasks?.reward_points || 0} баллов</b>
-                </p>
-
+            let photoHtml = `
                 <div style="
-                    margin-top:15px;
+                    background:#fff8e1;
+                    padding:12px;
+                    border-radius:12px;
+                    color:#8a6d1d;
                 ">
+                    📷 Фотография не прикреплена
+                </div>
+            `;
 
-                    <p style="
-                        margin-bottom:8px;
-                    ">
-                        📷 <b>Фото-доказательство:</b>
-                    </p>
+            if (submission.photo_url) {
+                const { data: photoData, error: photoError } =
+                    await supabaseClient.storage
+                        .from('task-proofs')
+                        .createSignedUrl(submission.photo_url, 3600);
 
-                    ${
-                        submission.proof_image_url
-                        ? `
+                if (!photoError && photoData?.signedUrl) {
+                    const photoLink = escapeHtml(photoData.signedUrl);
+
+                    photoHtml = `
+                        <a href="${photoLink}"
+                        target="_blank"
+                        rel="noopener noreferrer">
                             <img
-                                src="${submission.proof_image_url}"
+                                src="${photoLink}"
                                 alt="Фото-доказательство"
                                 style="
                                     width:100%;
@@ -5087,88 +5273,132 @@ function closeHistoryDetails() {
                                     background:#f5f5f5;
                                     cursor:pointer;
                                 "
-                                onclick="window.open(
-                                    '${submission.proof_image_url}',
-                                    '_blank'
-                                )"
                             >
+                        </a>
+                        <p style="
+                            color:#777;
+                            font-size:12px;
+                            margin-top:6px;
+                        ">
+                            Нажми на фотографию, чтобы открыть её полностью.
+                        </p>
+                    `;
+                } else {
+                    console.error('Ошибка получения фотографии:', photoError);
 
-                            <p style="
-                                color:#777;
-                                font-size:12px;
-                                margin-top:6px;
-                            ">
-                                Нажми на фотографию, чтобы открыть её полностью.
-                            </p>
-                        `
-                        : `
-                            <div style="
-                                background:#fff8e1;
-                                padding:12px;
-                                border-radius:12px;
-                                color:#8a6d1d;
-                            ">
-                                📷 Фотография не прикреплена
-                            </div>
-                        `
-                    }
-
-                </div>
-                    📷 Фото:
-                    <b>${submission.proof_text || 'не указано'}</b>
-                </p>
-
-                <p style="
-                    color:#999;
-                    font-size:13px;
-                ">
-                    Заявка №${submission.id}
-                </p>
-
-                <div style="
-                    display:flex;
-                    gap:10px;
-                    margin-top:15px;
-                ">
-
-                    <button
-                        onclick="approveTask(${submission.id})"
-                        style="
-                            flex:1;
-                            padding:13px;
-                            border:none;
-                            border-radius:14px;
-                            background:#4CAF50;
-                            color:white;
-                            font-size:15px;
-                            font-weight:bold;
-                            cursor:pointer;
-                        "
-                    >
-                        ✅ Одобрить
-                    </button>
-
-                    <button
-                        onclick="rejectTask(${submission.id})"
-                        style="
-                            flex:1;
-                            padding:13px;
-                            border:none;
-                            border-radius:14px;
-                            background:#ffebee;
+                    photoHtml = `
+                        <div style="
+                            background:#fff0f0;
+                            padding:12px;
+                            border-radius:12px;
                             color:#c62828;
-                            font-size:15px;
-                            font-weight:bold;
-                            cursor:pointer;
-                        "
-                    >
-                        ❌ Отклонить
-                    </button>
+                        ">
+                            Не удалось открыть фотографию.
+                        </div>
+                    `;
+                }
+            }
+
+            const taskTitle = escapeHtml(
+                submission.tasks?.title || 'Задание'
+            );
+
+            const userName = escapeHtml(
+                submission.user_id || 'Не указано'
+            );
+
+            const description = escapeHtml(
+                submission.proof_text || 'Описание отсутствует'
+            );
+
+            const points = Number(
+                submission.tasks?.reward_points || 0
+            );
+
+            return `
+                <div style="
+                    background:white;
+                    padding:20px;
+                    border-radius:20px;
+                    margin-bottom:15px;
+                    box-shadow:0 3px 12px rgba(0,0,0,0.06);
+                ">
+
+                    <h3 style="margin-top:0;color:#315f3b;">
+                        ${taskTitle}
+                    </h3>
+
+                    <p>
+                        👤 Пользователь:
+                        <b>${userName}</b>
+                    </p>
+
+                    <p>
+                        🌿 Награда:
+                        <b>${points} баллов</b>
+                    </p>
+
+                    <p>
+                        📝 Описание:
+                        ${description}
+                    </p>
+
+                    <div style="margin-top:15px;">
+                        <p>📷 <b>Фото-доказательство:</b></p>
+                        ${photoHtml}
+                    </div>
+
+                    <p style="color:#999;font-size:13px;">
+                        Заявка №${submission.id}
+                    </p>
+
+                    <div style="
+                        display:flex;
+                        gap:10px;
+                        margin-top:15px;
+                    ">
+
+                        <button
+                            onclick="approveTask(${Number(submission.id)})"
+                            style="
+                                flex:1;
+                                padding:13px;
+                                border:none;
+                                border-radius:14px;
+                                background:#4CAF50;
+                                color:white;
+                                font-size:15px;
+                                font-weight:bold;
+                                cursor:pointer;
+                            "
+                        >
+                            ✅ Одобрить
+                        </button>
+
+                        <button
+                            onclick="rejectTask(${Number(submission.id)})"
+                            style="
+                                flex:1;
+                                padding:13px;
+                                border:none;
+                                border-radius:14px;
+                                background:#ffebee;
+                                color:#c62828;
+                                font-size:15px;
+                                font-weight:bold;
+                                cursor:pointer;
+                            "
+                        >
+                            ❌ Отклонить
+                        </button>
+
+                    </div>
 
                 </div>
+            `;
+        }));
 
-            </div>
-        `).join('');
+        container.innerHTML = cards.join('');
     }
 
 
@@ -5431,15 +5661,9 @@ function closeHistoryDetails() {
     }
     function updateAdminButton() {
         const adminButton = document.getElementById('adminButton');
-        const isAdmin = localStorage.getItem('isAdmin');
-
         if (!adminButton) return;
-
-        if (isAdmin === 'true') {
-            adminButton.style.display = 'block';
-        } else {
-            adminButton.style.display = 'none';
-        }
+        const isAdmin = currentAuthUser && localStorage.getItem('isAdmin') === 'true';
+        adminButton.style.display = isAdmin ? 'block' : 'none';
     }
 
     updateAdminButton();
