@@ -3275,30 +3275,30 @@ async function submitTaskProof() {
             throw new Error('Не удалось найти задание в базе данных.');
         }
 
-        // Проверяем заявку только на это задание
-        .insert({
-            task_id: task.id,
-            user_id: userId,
-            auth_user_id: authUserId,
-            proof_text: `ТЕСТ БЕЗ ФОТО: ${description}`,
-            status: 'pending'
-        });
+        // Проверяем, отправлял ли пользователь заявку на это задание
+const { data: existingSubmission, error: checkError } =
+    await supabaseClient
+        .from('task_submissions')
+        .select('id, status')
+        .eq('task_id', task.id)
+        .eq('auth_user_id', authUserId)
+        .limit(1);
 
-        if (checkError) {
-            throw checkError;
-        }
+if (checkError) {
+    throw checkError;
+}
 
-        if (existingSubmission && existingSubmission.length > 0) {
-            const status = existingSubmission[0].status;
+if (existingSubmission && existingSubmission.length > 0) {
+    const status = existingSubmission[0].status;
 
-            if (status === 'pending') {
-                alert('Это задание уже ожидает проверки 🌿');
-            } else {
-                alert('Это задание уже подтверждено 🌱');
-            }
+    if (status === 'pending') {
+        alert('Это задание уже ожидает проверки 🌿');
+    } else {
+        alert('Это задание уже подтверждено 🌱');
+    }
 
-            return;
-        }
+    return;
+}
 
         // Подготавливаем фотографию
         // Загружаем фотографию в закрытое хранилище Supabase
