@@ -3810,25 +3810,11 @@ if (existingSubmission && existingSubmission.length > 0) {
         await loadNotifications();
     }
 
-    if (screenName === 'support') {
-
-        loadSupportMessages();
-
-        if (!window.supportRefreshInterval) {
-
-            window.supportRefreshInterval = setInterval(async () => {
-
-                if (document.getElementById('supportScreen')?.style.display === 'none') {
-                    clearInterval(window.supportRefreshInterval);
-                    window.supportRefreshInterval = null;
-                    return;
-                }
-
-                await loadSupportMessages();
-
-            }, 1000);
-        }
+    async function deleteNotification(notificationId) {
+        // ...
     }
+
+    function showScreen(screenName) {
 
     function showScreen(screenName) {
 
