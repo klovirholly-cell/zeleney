@@ -3312,7 +3312,6 @@ if (existingSubmission && existingSubmission.length > 0) {
     async function checkApprovedTasks() {
         console.log('ПРОВЕРКА ЗАДАНИЯ ЗАПУЩЕНА');
 
-        const userId = localStorage.getItem('userName') || 'Гость';
         const { data: { user }, error: userError } =
             await supabaseClient.auth.getUser();
 
