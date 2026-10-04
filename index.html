@@ -3313,15 +3313,20 @@ if (existingSubmission && existingSubmission.length > 0) {
         console.log('ПРОВЕРКА ЗАДАНИЯ ЗАПУЩЕНА');
 
         const userId = localStorage.getItem('userName') || 'Гость';
+        const { data: { user }, error: userError } =
+            await supabaseClient.auth.getUser();
 
-        console.log('Имя пользователя в приложении:', userId);
+        if (userError || !user) {
+            console.log('Пользователь не авторизован');
+            return;
+        }
 
-        if (userId === 'Гость') return;
+        console.log('ID пользователя:', user.id);
 
         const { data: submissions, error } = await supabaseClient
             .from('task_submissions')
             .select('id, task_id, status, admin_comment')
-            .eq('user_id', userId)
+            .eq('auth_user_id', user.id)
             .eq('status', 'approved');
 
         if (error) {
