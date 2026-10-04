@@ -2856,15 +2856,26 @@
         }
 
         const { error } = await supabaseClient
-            .from('profiles')
-            .update({ display_name: name })
-            .eq('id', user.id);
+            const { data: updatedProfile, error } = await supabaseClient
+        .from('profiles')
+        .update({ display_name: name })
+        .eq('id', user.id)
+        .select('id, display_name')
+        .maybeSingle();
 
-        if (error) {
-            console.error('Ошибка сохранения имени:', error);
-            alert('Не удалось сохранить имя. Попробуй ещё раз.');
-            return;
-        }
+    if (error) {
+        console.error('Ошибка сохранения имени:', error);
+        alert('Ошибка сохранения имени. Посмотри Console.');
+        return;
+    }
+
+    if (!updatedProfile) {
+        console.error('Профиль не обновлён. Проверь ID и права доступа.');
+        alert('Не удалось найти или обновить профиль в базе данных.');
+        return;
+    }
+
+    console.log('Имя сохранено в Supabase:', updatedProfile);
 
         localStorage.setItem('userName', name);
 
