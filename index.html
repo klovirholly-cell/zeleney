@@ -3154,6 +3154,7 @@
 
             try {
                 const position = await new Promise((resolve, reject) => {
+                    console.log('🟡 ЗАПРОС ГЕОЛОКАЦИИ');
                     navigator.geolocation.getCurrentPosition(
                         resolve,
                         reject,
@@ -3167,6 +3168,7 @@
 
                 window.taskPhotoLatitude = position.coords.latitude;
                 window.taskPhotoLongitude = position.coords.longitude;
+                console.log('🟢 ГЕОЛОКАЦИЯ ПОЛУЧЕНА');
 
                 console.log(
                     '📍 Геолокация фото:',
