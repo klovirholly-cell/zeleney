@@ -1510,6 +1510,24 @@
             placeholder="📍 Где посадила?"
         >
 
+        <input
+            type="file"
+            id="plantPhoto"
+            accept="image/*"
+            style="display: none;"
+            onchange="showPlantPhoto(this)"
+        >
+
+        <button
+            type="button"
+            class="plant-confirm"
+            onclick="document.getElementById('plantPhoto').click()"
+        >
+            📷 Добавить фото
+        </button>
+
+        <div id="plantPhotoPreview" style="margin-top:10px;"></div>
+
         <button class="plant-confirm" onclick="confirmPlant()">
             Добавить 🌱
         </button>
@@ -3482,9 +3500,22 @@ if (existingSubmission && existingSubmission.length > 0) {
     function closePlantModal() {
         document.getElementById('plantModal').style.display = 'none';
     }
+    function showPlantPhoto(input) {
+        const preview = document.getElementById('plantPhotoPreview');
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            preview.innerHTML = `
+                📷 <b>Фото выбрано</b><br>
+                <small>${file.name}</small>
+            `;
+        }
+    }
     function confirmPlant() {
         const plantType = document.getElementById('plantType').value;
         const plantPlace = document.getElementById('plantPlace').value.trim();
+        const plantPhoto = document.getElementById('plantPhoto').files[0];  
 
         if (!plantType) {
             alert('Выбери растение 🌱');
@@ -3496,20 +3527,28 @@ if (existingSubmission && existingSubmission.length > 0) {
             return;
         }
 
-        addPlant(plantType, plantPlace);
+        addPlant(plantType, plantPlace, plantPhoto);
 
         document.getElementById('plantType').value = '';
         document.getElementById('plantPlace').value = '';
 
         closePlantModal();
     }
-    async function addPlant(plantType = 'Растение', plantPlace = 'Только что') {
+    async function addPlant(
+        plantType = 'Растение',
+        plantPlace = 'Только что',
+        plantPhoto = null
+    ) {
         let plantCount = document.getElementById('plantCount');
         let progressText = document.getElementById('progressText');
         let progressPercent = document.getElementById('progressPercent');
         let progressBar = document.querySelector('.progress-bar');
 
         let count = Number(plantCount.textContent);
+        
+        if (plantPhoto) {
+            console.log('📷 Фото растения:', plantPhoto.name);
+        }
 
         if (count < 50) {
             count = count + 1;
