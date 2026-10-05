@@ -5139,6 +5139,8 @@ function closeHistoryDetails() {
                 user_id,
                 proof_text,
                 photo_url,
+                latitude,
+                longitude,
                 status,
                 created_at,
                 tasks (
@@ -5293,6 +5295,15 @@ function closeHistoryDetails() {
                     <p>
                         📝 Описание:
                         ${description}
+                    </p>
+                    <p>
+                        📍 Место выполнения:
+                        ${
+                            submission.latitude !== null &&
+                            submission.longitude !== null
+                                ? `${Number(submission.latitude).toFixed(6)}, ${Number(submission.longitude).toFixed(6)}`
+                                : 'Геолокация не получена'
+                        }
                     </p>
 
                     <div style="margin-top:15px;">
