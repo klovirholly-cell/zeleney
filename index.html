@@ -3253,6 +3253,7 @@ const { data: existingSubmission, error: checkError } =
         .select('id, status')
         .eq('task_id', task.id)
         .eq('auth_user_id', authUserId)
+        .in('status', ['pending', 'approved'])
         .limit(1);
 
 if (checkError) {
@@ -3264,11 +3265,18 @@ if (existingSubmission && existingSubmission.length > 0) {
 
     if (status === 'pending') {
         alert('Это задание уже ожидает проверки 🌿');
-    } else {
-        alert('Это задание уже подтверждено 🌱');
+        return;
     }
 
-    return;
+    if (status === 'approved') {
+        alert('Это задание уже подтверждено 🌱');
+        return;
+    }
+
+    // Если задание было отклонено — разрешаем отправить его заново
+    if (status === 'rejected') {
+        console.log('Предыдущая заявка отклонена — разрешаем повторную отправку.');
+    }
 }
 
         // Подготавливаем фотографию
