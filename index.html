@@ -5335,7 +5335,16 @@ function closeHistoryDetails() {
                         ${
                             submission.latitude !== null &&
                             submission.longitude !== null
-                                ? `${Number(submission.latitude).toFixed(6)}, ${Number(submission.longitude).toFixed(6)}`
+                                ? `
+                                    ${Number(submission.latitude).toFixed(6)}, ${Number(submission.longitude).toFixed(6)}
+                                    <br>
+                                    <button
+                                        onclick="window.open('https://www.google.com/maps?q=${submission.latitude},${submission.longitude}', '_blank')"
+                                        style="margin-top:8px;padding:8px 12px;border:none;border-radius:10px;background:#e8f5e9;cursor:pointer;"
+                                    >
+                                        🗺️ Открыть на карте
+                                    </button>
+                                `
                                 : 'Геолокация не получена'
                         }
                     </p>
