@@ -4649,7 +4649,8 @@ if (plantPhoto && !window.helpingPoint) {
                 `showHistoryDetails(
                     'plant',
                     '${item.title || ''}',
-                    '${item.place || ''}'
+                    '${item.place || ''}',
+                    '${item.photo_url || ''}'
                 )`
             );
 
@@ -4686,16 +4687,26 @@ if (plantPhoto && !window.helpingPoint) {
         });
     }
 
-function showHistoryDetails(type, plantType, plantPlace) {
+function showHistoryDetails(type, plantType, plantPlace, photoUrl = null) {
     let details = document.getElementById('historyDetails');
     let title = document.getElementById('historyDetailsTitle');
     let text = document.getElementById('historyDetailsText');
 
     if (type === 'plant') {
         title.textContent = '🌱 ' + plantType;
-        text.textContent =
+
+        text.innerHTML =
             '📍 ' + plantPlace +
-            '\n\nТы посадила это растение и помогла сделать город зеленее! 💚';
+            '<br><br>Ты посадила это растение и помогла сделать город зеленее! 💚' +
+            (photoUrl
+                ? `
+                    <br><br>
+                    <img
+                        src="https://oooorjusfbjvnvviprkg.supabase.co/storage/v1/object/public/plant-photos/${photoUrl}"
+                        style="width:100%; max-height:300px; object-fit:cover; border-radius:16px;"
+                    >
+                `
+                : '');
     }
 
     details.style.display = 'block';
