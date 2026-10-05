@@ -3274,8 +3274,9 @@ if (existingSubmission && existingSubmission.length > 0) {
         console.log('ШАГ 4: начинаем сохранение заявки');
         // Сохраняем заявку
         if (button) button.textContent = 'Сохраняем в базу...';
-        const { error: submissionError } = await supabaseClient
         console.log('UUID перед сохранением заявки:', authUserId);
+
+        const { error: submissionError } = await supabaseClient
             .from('task_submissions')
             .insert({
                 task_id: task.id,
