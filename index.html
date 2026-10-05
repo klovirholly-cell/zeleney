@@ -4496,6 +4496,7 @@ if (plantPhoto && !window.helpingPoint) {
         alert('Сообщение отправлено! 💚');
     }
     async function addHistory(icon, title, place, photoUrl = null) {
+        console.log('📸 PHOTO URL В HISTORY:', photoUrl);
 
         let historyList = document.getElementById('historyList');
 
