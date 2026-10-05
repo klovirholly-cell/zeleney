@@ -5331,7 +5331,10 @@ function closeHistoryDetails() {
                         ${description}
                     </p>
                     <p>
-                        📍 Место выполнения:
+                        📍 <b>Место выполнения задания</b>:
+                        <small style="display:block;color:#777;margin-top:4px;">
+                            Геолокация получена автоматически при добавлении фотографии.
+                        </small>
                         ${
                             submission.latitude !== null &&
                             submission.longitude !== null
