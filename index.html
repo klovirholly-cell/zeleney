@@ -3578,13 +3578,7 @@ if (existingSubmission && existingSubmission.length > 0) {
                 percent + '%';
         }
 
-        if (!window.helpingPoint) {
-            addHistory(
-                '🌱',
-                'Посадила: ' + plantType,
-                '📍 ' + plantPlace
-            );
-        }
+        
 
         
         let plantPhotoPath = null;
@@ -3610,6 +3604,14 @@ if (plantPhoto && !window.helpingPoint) {
     }
 
     plantPhotoPath = uploadedPlantPhoto.path;
+    if (!window.helpingPoint) {
+        await addHistory(
+            '🌱',
+            'Посадила: ' + plantType,
+            '📍 ' + plantPlace,
+            plantPhotoPath
+        );
+    }
 
     console.log('📷 Фото растения загружено:', plantPhotoPath);
 }
@@ -4493,7 +4495,7 @@ if (plantPhoto && !window.helpingPoint) {
 
         alert('Сообщение отправлено! 💚');
     }
-    async function addHistory(icon, title, place) {
+    async function addHistory(icon, title, place, photoUrl = null) {
 
         let historyList = document.getElementById('historyList');
 
@@ -4558,7 +4560,8 @@ if (plantPhoto && !window.helpingPoint) {
                 user_id: userId,
                 icon: icon,
                 title: title,
-                place: place
+                place: place,
+                photo_url: photoUrl
             });
 
         if (error) {
