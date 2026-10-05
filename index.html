@@ -3140,7 +3140,7 @@
     function closeTaskProof() {
         document.getElementById('taskProofModal').style.display = 'none';
     }
-    function showTaskPhoto(input) {
+    async function showTaskPhoto(input) {
         const preview = document.getElementById('taskPhotoPreview');
 
         if (input.files && input.files[0]) {
@@ -3148,8 +3148,52 @@
 
             preview.innerHTML = `
                 📷 <b>Фото выбрано</b><br>
-                <small>${file.name}</small>
+                <small>${file.name}</small><br>
+                📍 Получаем геолокацию...
             `;
+
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(
+                        resolve,
+                        reject,
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                });
+
+                window.taskPhotoLatitude = position.coords.latitude;
+                window.taskPhotoLongitude = position.coords.longitude;
+
+                console.log(
+                    '📍 Геолокация фото:',
+                    window.taskPhotoLatitude,
+                    window.taskPhotoLongitude
+                );
+
+                preview.innerHTML = `
+                    📷 <b>Фото выбрано</b><br>
+                    <small>${file.name}</small><br>
+                    📍 Геолокация сохранена
+                `;
+
+            } catch (error) {
+                window.taskPhotoLatitude = null;
+                window.taskPhotoLongitude = null;
+
+                preview.innerHTML = `
+                    📷 <b>Фото выбрано</b><br>
+                    <small>${file.name}</small><br>
+                    ⚠️ Геолокация не получена
+                `;
+
+                alert(
+                    'Разреши доступ к геолокации 📍, чтобы подтвердить место выполнения задания.'
+                );
+            }
         }
     }
     
@@ -3186,31 +3230,13 @@ async function submitTaskProof() {
 
     const authUserId = authData.user.id;
 
-        let latitude = null;
-        let longitude = null;
-
-        try {
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    resolve,
-                    reject,
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
-                );
-            });
-
-            latitude = position.coords.latitude;
-            longitude = position.coords.longitude;
-
-            console.log('Геолокация получена:', latitude, longitude);
-
-        } catch (error) {
-            alert('Нужно разрешить доступ к геолокации 📍, чтобы выполнить это задание.');
-            return;
-        }
+    const latitude = window.taskPhotoLatitude;
+    const longitude = window.taskPhotoLongitude;
+    
+    if (latitude === null || longitude === null) {
+        alert('Сначала получи геолокацию 📍, чтобы подтвердить место выполнения.');
+        return;
+    }
 
     if (!description) {
         alert('Напиши описание выполненной работы 📝');
