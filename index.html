@@ -4652,15 +4652,14 @@ if (plantPhoto && !window.helpingPoint) {
 
             element.className = 'history-item';
 
-            element.setAttribute(
-                'onclick',
-                `showHistoryDetails(
+            element.onclick = () => {
+                showHistoryDetails(
                     'plant',
-                    '${item.title || ''}',
-                    '${item.place || ''}',
-                    '${item.photo_url || ''}'
-                )`
-            );
+                    item.title || '',
+                    item.place || '',
+                    item.photo_url || ''
+                );
+            };
 
             const date = item.created_at
                 ? new Date(item.created_at).toLocaleDateString('ru-RU')
