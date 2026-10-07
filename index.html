@@ -4621,6 +4621,9 @@ if (plantPhoto && !window.helpingPoint) {
 
         historyList.innerHTML = '';
 
+        console.log('📖 ИСТОРИЯ ЗАГРУЖАЕТСЯ');
+        console.log('📦 ДАННЫЕ HISTORY:', data);
+
         if (!data || data.length === 0) {
 
             historyList.innerHTML = `
@@ -4639,7 +4642,7 @@ if (plantPhoto && !window.helpingPoint) {
         }
 
         data.forEach(item => {
-            
+
             console.log('📷 HISTORY PHOTO:', item.photo_url);
 
             const element = document.createElement('div');
