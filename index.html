@@ -2482,7 +2482,7 @@
                 📷
             </button>
 
-            <button onclick="showScreen('history')" id="nav-history">
+            <button onclick="showScreen('history'); loadHistoryFromSupabase();" id="nav-history">
                 <span class="nav-icon">📖 </span>
                 История
             </button>
@@ -3893,7 +3893,7 @@ if (plantPhoto && !window.helpingPoint) {
     }
 
         function showScreen(screenName) {
-            
+
             console.log('🖥️ SHOW SCREEN:', screenName);
 
         if (window.supportRefreshInterval) {
