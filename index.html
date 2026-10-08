@@ -4770,10 +4770,13 @@ async function deleteHistoryItem(historyId, historyUserId, photoUrl = '') {
 
     if (!confirmed) return;
 
-    const { error } = await supabaseClient
+    const { data: deletedRows, error } = await supabaseClient
         .from('history')
         .delete()
-        .eq('id', historyId);
+        .eq('id', historyId)
+        .select('id');
+
+    console.log('🗑️ УДАЛЕНИЕ HISTORY:', deletedRows, error);
 
     if (error) {
         console.error('Ошибка удаления истории:', error);
