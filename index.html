@@ -2549,6 +2549,7 @@
         setAuthMode(authMode === 'signup' ? 'login' : 'signup');
     }
 
+
     window.toggleAuthMode = toggleAuthMode;
 
     async function registerUser() {
@@ -3612,7 +3613,7 @@ if (plantPhoto && !window.helpingPoint) {
             }
         }
         // Обновляем счётчик только после успешного сохранения
-        let count = Number(plantCount.textContent);
+        count = Number(plantCount.textContent);
 
         if (count < 50) {
             count++;
