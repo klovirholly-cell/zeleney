@@ -3550,33 +3550,7 @@ if (existingSubmission && existingSubmission.length > 0) {
             console.log('📷 Фото растения:', plantPhoto.name);
         }
 
-        if (count < 50) {
-            count = count + 1;
-
-            let percent = Math.round(count / 50 * 100);
-
-            plantCount.textContent = count;
-            localStorage.setItem('plantCount', count);
-
-            document.getElementById('profilePlantCount').textContent = count;
-
-            document.getElementById('profileProgressCount').textContent = count;
-            document.getElementById('profileProgressText').textContent =
-                count + ' / 50 до следующей цели';
-            document.getElementById('profileProgressPercent').textContent =
-                percent + '%';
-            document.getElementById('profileProgressBar').style.width =
-                percent + '%';
-
-            progressText.textContent =
-                count + ' / 50 до следующей цели';
-
-            progressPercent.textContent =
-                percent + '%';
-
-            progressBar.style.width =
-                percent + '%';
-        }
+        
 
         
 
@@ -3633,9 +3607,34 @@ if (plantPhoto && !window.helpingPoint) {
 
             if (error) {
                 console.error('Ошибка сохранения растения:', error);
+                alert('Не удалось сохранить растение. Попробуй ещё раз 💚');
+                return;
             }
         }
+        // Обновляем счётчик только после успешного сохранения
+        let count = Number(plantCount.textContent);
 
+        if (count < 50) {
+            count++;
+
+            const percent = Math.round(count / 50 * 100);
+
+            plantCount.textContent = count;
+            localStorage.setItem('plantCount', count);
+
+            document.getElementById('profilePlantCount').textContent = count;
+            document.getElementById('profileProgressCount').textContent = count;
+            document.getElementById('profileProgressText').textContent =
+                count + ' / 50 до следующей цели';
+            document.getElementById('profileProgressPercent').textContent =
+                percent + '%';
+            document.getElementById('profileProgressBar').style.width =
+                percent + '%';
+
+            progressText.textContent = count + ' / 50 до следующей цели';
+            progressPercent.textContent = percent + '%';
+            progressBar.style.width = percent + '%';
+        }
         alert('Растение добавлено! 🌱💚');
     }
     async function openNotifications() {
@@ -4777,10 +4776,15 @@ async function deleteHistoryItem(historyId, historyUserId, photoUrl = '') {
         .select('id');
 
     console.log('🗑️ УДАЛЕНИЕ HISTORY:', deletedRows, error);
-
+    
     if (error) {
         console.error('Ошибка удаления истории:', error);
         alert('Не удалось удалить запись.');
+        return;
+    }
+
+    if (!deletedRows || deletedRows.length === 0) {
+        alert('Запись не удалена. Проверь права доступа.');
         return;
     }
 
