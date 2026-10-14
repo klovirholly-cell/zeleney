@@ -1783,27 +1783,32 @@
                     <p>Добавь своё первое растение</p>
                 </div>
             </div>
-            <h3>Зелёный друг</h3>
-            <p>Добавь 10 растений</p>
+            <div class="achievement-card">
+                <div class="achievement-icon">🌱</div>
+                <div>
+                    <h3>Зелёный друг</h3>
+                    <p>Добавь 10 растений</p>
                 </div>
             </div>
-
             <div class="achievement-card">
                 <div class="achievement-icon">🌱</div>
                 <div>
                     <h3>Друг природы</h3>
                     <p>Добавь 5 растений</p>
                 </div>
+            <div class="achievement-card">
+                <div class="achievement-icon">🌱</div>
                 <div>
                     <h3>Друг зелёного города</h3>
                     <p>Добавь 15 растений</p>
                 </div>
+            <div class="achievement-card">
+                <div class="achievement-icon">🌱</div>
                 <div>
                     <h3>Хранитель зелени</h3>
                     <p>Добавь 25 растений</p>
                 </div>
             </div>
-            
             <div class="achievement-card">
                 <div class="achievement-icon">🌳</div>
                 <div>
@@ -1811,7 +1816,6 @@
                     <p>Добавь 50 растений</p>
                 </div>
             </div>
-
             <div class="achievement-card">
                 <div class="achievement-icon">🏆</div>
                 <div>
@@ -3741,7 +3745,7 @@ if (plantPhoto && !window.helpingPoint) {
 
             plantCount.textContent = count;
             localStorage.setItem('plantCount', count);
-            updateAchievements();
+            
 
             document.getElementById('profilePlantCount').textContent = count;
             document.getElementById('profileProgressCount').textContent = count;
@@ -4964,7 +4968,7 @@ function closeHistoryDetails() {
     function updateAchievements() {
         const plantCount = Number(localStorage.getItem('plantCount')) || 0;
 
-        const achievements = document.querySelectorAll('.achievement-card');
+        const achievements = document.querySelectorAll('#achievements .achievement-card');
 
         achievements.forEach(card => {
             card.classList.remove('completed');
