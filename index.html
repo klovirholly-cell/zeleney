@@ -995,7 +995,7 @@
     background: #F0F6EA;
     }
 
-    #achievements .achievement-card > div(2) {
+    #achievements .achievement-card > div:nth-child(2) { 
     flex: 1;
     min-width: 0;
     }
@@ -1157,7 +1157,7 @@
     }
     .stats {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
         margin: 10px 0 20px;
     }
@@ -1910,6 +1910,25 @@
 
             </div>
 
+            
+
+
+                <div class="stat">
+                    <strong id="pointCount">5</strong>
+                    <span>точек</span>
+                </div>
+
+                <div class="stat">
+                    <strong id="rewardPoints">0</strong>
+                    <span>🌿 баллов</span>
+                </div>
+
+                <div class="stat">
+                    <strong id="photoCount">3</strong>
+                    <span>фото</span>
+                </div>
+
+            </div>
             <!-- МОИ ДОСТИЖЕНИЯ -->
             <div class="achievements-section">
                 <h3>🏆 Мои достижения</h3>
@@ -1946,24 +1965,6 @@
                         </span>
                     </div>
                 </div>
-            </div>
-
-
-                <div class="stat">
-                    <strong id="pointCount">5</strong>
-                    <span>точек</span>
-                </div>
-
-                <div class="stat">
-                    <strong id="rewardPoints">0</strong>
-                    <span>🌿 баллов</span>
-                </div>
-
-                <div class="stat">
-                    <strong id="photoCount">3</strong>
-                    <span>фото</span>
-                </div>
-
             </div>
 
             <div class="profile-progress">
