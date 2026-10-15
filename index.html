@@ -965,6 +965,59 @@
         margin: 0 0 4px;
         font-size: 16px;
     }
+    /* Аккуратные карточки на экране достижений */
+    #achievements .achievement-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 76px;
+    box-sizing: border-box;
+    padding: 12px;
+    margin: 0 0 12px;
+    border: 1px solid #E1EBDD;
+    border-radius: 16px;
+    background: #FFFFFF;
+    position: relative;
+    }
+
+    #achievements .achievement-card.completed {
+    background: #EAF5E7;
+    border-color: #CFE5C9;
+    }
+
+    #achievements .achievement-card .achievement-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+    border-radius: 14px;
+    background: #F0F6EA;
+    }
+
+    #achievements .achievement-card > div(2) {
+    flex: 1;
+    min-width: 0;
+    }
+
+    #achievements .achievement-card h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    line-height: 1.3;
+    }
+
+    #achievements .achievement-card p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    }
+
+    #achievements .achievement-card .achievement-check {
+    flex-shrink: 0;
+    margin-left: auto;
+    color: #43834A;
+    font-size: 20px;
+    }
 
     .achievement-card p {
         margin: 0;
@@ -1767,62 +1820,64 @@
 
         <!-- ДОСТИЖЕНИЯ -->
 <section id="achievements" class="screen">
-
     <h1>Достижения 🏆</h1>
     <p class="subtitle">Твои зелёные успехи</p>
 
-    
+    <div class="achievement-card">
+        <div class="achievement-icon">🌱</div>
+        <div>
+            <h3>Первые шаги</h3>
+            <p>Добавь своё первое растение</p>
+        </div>
+    </div>
 
     <div class="achievement-card">
-        <div class="achievement-icon">🌿</div>
+        <div class="achievement-icon">🌱</div>
         <div>
-            <div class="achievement-card">
-                <div class="achievement-icon">🌱</div>
-                <div>
-                    <h3>Первые шаги</h3>
-                    <p>Добавь своё первое растение</p>
-                </div>
-            </div>
-            <div class="achievement-card">
-                <div class="achievement-icon">🌱</div>
-                <div>
-                    <h3>Зелёный друг</h3>
-                    <p>Добавь 10 растений</p>
-                </div>
-            </div>
-            <div class="achievement-card">
-                <div class="achievement-icon">🌱</div>
-                <div>
-                    <h3>Друг природы</h3>
-                    <p>Добавь 5 растений</p>
-                </div>
-            <div class="achievement-card">
-                <div class="achievement-icon">🌱</div>
-                <div>
-                    <h3>Друг зелёного города</h3>
-                    <p>Добавь 15 растений</p>
-                </div>
-            <div class="achievement-card">
-                <div class="achievement-icon">🌱</div>
-                <div>
-                    <h3>Хранитель зелени</h3>
-                    <p>Добавь 25 растений</p>
-                </div>
-            </div>
-            <div class="achievement-card">
-                <div class="achievement-icon">🌳</div>
-                <div>
-                    <h3>Любитель природы</h3>
-                    <p>Добавь 50 растений</p>
-                </div>
-            </div>
-            <div class="achievement-card">
-                <div class="achievement-icon">🏆</div>
-                <div>
-                    <h3>Герой города</h3>
-                    <p>Добавь 100 растений</p>
-                </div>
-            </div>
+            <h3>Зелёный друг</h3>
+            <p>Добавь 10 растений</p>
+        </div>
+    </div>
+
+    <div class="achievement-card">
+        <div class="achievement-icon">🌱</div>
+        <div>
+            <h3>Друг природы</h3>
+            <p>Добавь 5 растений</p>
+        </div>
+    </div>
+
+    <div class="achievement-card">
+        <div class="achievement-icon">🌱</div>
+        <div>
+            <h3>Друг зелёного города</h3>
+            <p>Добавь 15 растений</p>
+        </div>
+    </div>
+
+    <div class="achievement-card">
+        <div class="achievement-icon">🌱</div>
+        <div>
+            <h3>Хранитель зелени</h3>
+            <p>Добавь 25 растений</p>
+        </div>
+    </div>
+
+    <div class="achievement-card">
+        <div class="achievement-icon">🌳</div>
+        <div>
+            <h3>Любитель природы</h3>
+            <p>Добавь 50 растений</p>
+        </div>
+    </div>
+
+    <div class="achievement-card">
+        <div class="achievement-icon">🏆</div>
+        <div>
+            <h3>Герой города</h3>
+            <p>Добавь 100 растений</p>
+        </div>
+    </div>
 
         </section>
         <!-- ПРОФИЛЬ -->
